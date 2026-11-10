@@ -251,7 +251,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="cap">A recém-nascida, pouco depois do nascimento. Já nesta altura se notava um talento natural para dar colo.</p>
     <div class="cols">
       <p>Foi hoje, 22 de novembro de 1988, que a família recebeu a notícia que mudaria o rumo das décadas seguintes. Nasceu Carolina, uma bebé que, segundo testemunhas presentes no local, chorou pouco e sorriu muito, comportamento que mantém até hoje.</p>
-      <p>Os analistas consultados por este jornal são unânimes: estamos perante alguém com potencial para se tornar madrinha de excelência. Um deles arriscou uma previsão ousada: "Daqui a umas duas décadas, vai haver um afilhado com muita sorte."</p>
+      <p>Os analistas consultados por este jornal são unânimes: estamos perante alguém com potencial para se tornar madrinha de excelência. Um deles arriscou uma previsão ousada: "Daqui a uns 25 anos, vai haver um afilhado com muita sorte."</p>
       <p>A família pede privacidade neste momento de alegria, mas confirma que vai haver bolo. Muito bolo. O Diário da Família acompanhará o caso nos próximos 38 anos.</p>
     </div>
     <div class="grid">
@@ -270,11 +270,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="fin">
     <div class="small">Última sala · Nota do curador</div>
     <h2>Sobre esta exposição</h2>
-    <div class="placard">
-      <p>Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros.</p>
-      <p>Nos anos, no Natal e nas tardes em que mais ninguém tinha tempo e tu arranjavas. Este museu é pequeno, mas tudo o que está cá dentro é verdade.</p>
-      <p>Não digo isto muitas vezes, por isso fiz-te um museu. É mais fácil pendurar na parede do que dizer em voz alta.</p>
-      <p>Parabéns, madrinha. Gosto muito de ti.</p>
+    <div class="placard"><div id="carta"></div>
       <p class="sign">O teu afilhado e curador, Tiago</p>
     </div>
     <div class="book">
@@ -288,69 +284,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 </section>
 <canvas id="gold" aria-hidden="true"></canvas>
 
+<script src="conteudo.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* =========================================================
-   CONTEÚDO. Troca as fotos (pasta fotos/), as datas e os textos.
-   Se a foto não existir, aparece uma pintura com o emoji.
-   ========================================================= */
-const SALAS=[
-  {nome:'O princípio',wall:'#2f4a3f',obras:[
-    {foto:'fotos/1.jpg',e:'👶',paint:'linear-gradient(135deg,#9fb7c9,#55708a)',t:'O batizado',y:'2010',
-     tech:'Água benta sobre bebé, com madrinha em pânico controlado',
-     tx:'Repare na firmeza com que a madrinha segura a obra principal, que chora. Os críticos consideram esta peça a fundação de todo o período posterior. Nunca foi devolvida.'},
-    {foto:'fotos/2.jpg',e:'🎂',paint:'linear-gradient(135deg,#e7b7a3,#a35d4c)',t:'Primeiro aniversário',y:'2011',
-     tech:'Bolo sobre cara, técnica de impacto',
-     tx:'Obra de transição. O artista, então com um ano, explora pela primeira vez a relação entre o bolo e a madrinha. A madrinha ainda hoje encontra glacé na roupa dessa época.'}]},
-  {nome:'O período dourado',wall:'#6b2a2a',obras:[
-    {foto:'fotos/3.jpg',e:'🎁',paint:'linear-gradient(135deg,#e8cf8a,#a3772f)',t:'Natal, sem falhas',y:'2015',
-     tech:'Papel de embrulho, fita-cola e paciência',
-     tx:'Esta série é célebre pela regularidade. Durante anos seguidos, a madrinha produziu presentes com precisão de relojoeiro. Os especialistas nunca encontraram um ano em falta.'},
-    {foto:'fotos/4.jpg',e:'🍰',paint:'linear-gradient(135deg,#d9c3e0,#7b5a8c)',t:'Tarde de domingo',y:'2017',
-     tech:'Sofá, televisão e lanche reforçado',
-     tx:'Uma natureza-morta de domingo. Observe a calma da composição: ninguém tem pressa, ninguém olha para o relógio. Os historiadores chamam a isto "a época de ouro do lanche".'}]},
-  {nome:'Arquivo histórico',wall:'#23324a',obras:[
-    {jornal:true,foto:'fotos/bebe.jpg',e:'📰',paint:'linear-gradient(135deg,#efe7d3,#bdb196)',t:'Diário da Família, 22/11/1988',y:'1988',
-     tech:'Tinta de jornal sobre papel, edição única',
-     tx:'A peça mais antiga da coleção. Trata-se da primeira página publicada no dia em que tudo começou. Recomenda-se a leitura completa, sobretudo dos classificados.'}]},
-  {nome:'Período contemporâneo',wall:'#7a5a26',obras:[
-    {foto:'fotos/5.jpg',e:'🍕',paint:'linear-gradient(135deg,#f0b36a,#b5542f)',t:'Adolescente com fome',y:'2023',
-     tech:'Frigorífico aberto, luz natural',
-     tx:'Peça do período tardio. O afilhado, já maior do que a madrinha, mantém a pose clássica de quem pergunta "o que há para comer". A madrinha responde com a generosidade de sempre.'},
-    {foto:'fotos/6.jpg',e:'📸',paint:'linear-gradient(135deg,#a9d3c9,#4b8577)',t:'Selfie de família',y:'2025',
-     tech:'Telemóvel em braço esticado, alguém de olhos fechados',
-     tx:'Obra coletiva. Há sempre uma pessoa a piscar os olhos. A curadoria decidiu que isso faz parte da autenticidade da peça e recusou qualquer restauro.'}]},
-  {nome:'Sala do curador',wall:'#1f1d1b',final:true,obras:[
-    {foto:'fotos/7.jpg',e:'💛',paint:'linear-gradient(135deg,#e9d6a8,#9c7a3c)',t:'Nós os dois',y:'2026',
-     tech:'Obra principal da coleção. Não está à venda.',
-     tx:'A peça central desta exposição. Não precisa de explicação, mas o curador deixou uma nota.',fin:true}]}
-];
-
-/* Portas entre salas: uma pergunta, a resposta certa dá o código */
-const PORTAS=[
-  {q:'Quem é o melhor afilhado do mundo?',o:['O Tiago','O Tiago','O Tiago'],c:[0,1,2],ok:'Resposta certíssima. Não havia outra.',code:'2010'},
-  {q:'O que é que a madrinha nunca disse ao afilhado?',o:['Estás tão crescido','Já comeste?','Não'],c:[2],ok:'Exato. Nunca. Nem uma vez.',code:'2512'},
-  {q:'Em que ano abriu a primeira sala deste museu, ou seja, em que ano nasceste?',o:['1987','1988','Isso não se pergunta a uma senhora'],c:[1,2],ok:'Certo. Mas ninguém diria.',code:'1988'},
-  {q:'Quantas velas vais apagar este ano?',o:['36','38','Prefiro não contar'],c:[1,2],ok:'Trinta e oito. E todas merecidas.',code:'2211'}
-];
-
-/* Trailer: cada cena pode mostrar uma foto (fotos/N.jpg) se existir */
-const CENAS=[
-  {h:'<div class="s">Num mundo onde os afilhados não param de crescer...</div>',v:'Num mundo onde os afilhados não param de crescer.',d:3700,hit:1},
-  {h:'<div class="s">... uma mulher aceitou uma missão</div>',v:'Uma mulher aceitou uma missão.',d:3100,hit:1},
-  {h:'<div class="big">2010</div><div class="s">O batizado</div>',v:'Dois mil e dez.',d:2800,hit:2,foto:'fotos/1.jpg'},
-  {h:'<div class="q">"Segura-o tu, que eu tenho medo de o deixar cair."</div>',v:'',d:3200},
-  {h:'<div class="s">Anos. Natais. Tardes de domingo.</div>',v:'Anos. Natais. Tardes de domingo.',d:3300,hit:1,foto:'fotos/3.jpg'},
-  {h:'<div class="s">Ela nunca falhou um</div>',v:'Ela nunca falhou um.',d:2700,hit:2},
-  {h:'<div class="q">"Estás tão crescido!"</div><div class="s" style="margin-top:10px;color:var(--muted)">Ela, em todos os encontros desde 2010</div>',v:'',d:3500,foto:'fotos/5.jpg'},
-  {h:'<div class="s">Este inverno</div>',v:'Este inverno,',d:2000,hit:1},
-  {h:'<div class="s">a lenda faz</div>',v:'a lenda faz',d:1500},
-  {h:'<div class="big"><em>38</em></div>',v:'trinta e oito.',d:2500,hit:3},
-  {h:'<div class="cr">Uma exposição de <b>o afilhado</b><br>Curadoria <b>o afilhado</b><br>Orçamento <b>nenhum</b><br>Com <b>Carolina Breda</b></div>',v:'',d:4200},
-  {h:'<div class="big" style="font-size:clamp(40px,12vw,72px)">Museu da Madrinha</div><div class="s" style="margin-top:8px;color:var(--gold)">A exposição está aberta</div>',v:'O Museu da Madrinha. A exposição está aberta.',d:4200,hit:3}
-];
 
 /* ---------- som ---------- */
 let ac=null;
@@ -366,7 +303,18 @@ function droneStop(){droneNodes.forEach(({o,g})=>{try{g.gain.setTargetAtTime(0,a
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 function voice(){const v=speechSynthesis.getVoices();return v.find(x=>/pt[-_]PT/i.test(x.lang))||v.find(x=>/^pt/i.test(x.lang))}
 function say(t,opt={},onend){try{if(!t)return;const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';u.rate=opt.rate||.92;u.pitch=opt.pitch||.8;const v=voice();if(v)u.voice=v;if(onend)u.onend=onend;speechSynthesis.speak(u)}catch(e){onend&&onend()}}
-function hush(){try{speechSynthesis.cancel()}catch(e){}}
+function hush(){try{speechSynthesis.cancel()}catch(e){}if(curAudio){curAudio.pause();curAudio=null}}
+/* A tua voz: tenta audio/<id>.m4a, .mp3, .webm, .wav. Se não houver, usa a voz sintética. */
+let curAudio=null;const audioCache={};
+function findAudio(id){if(id in audioCache)return audioCache[id];
+  audioCache[id]=(async()=>{for(const ext of ['m4a','mp3','webm','wav','aac']){const src=`audio/${id}.${ext}`;
+    const ok=await new Promise(r=>{const a=new Audio();a.preload='metadata';a.onloadedmetadata=()=>r(a);a.onerror=()=>r(null);a.src=src});if(ok)return src}return null})();
+  return audioCache[id]}
+async function speak(voz,texto,opt,onend){
+  if(!voz&&!texto){onend&&onend();return 0}
+  const src=voz&&voz.id?await findAudio(voz.id):null;
+  if(src){hush();const a=new Audio(src);curAudio=a;a.onended=()=>{if(curAudio===a)curAudio=null;onend&&onend()};try{await a.play()}catch(e){onend&&onend()}return (a.duration||0)*1000}
+  say(texto||(voz&&voz.texto),opt,onend);return 0}
 
 /* ---------- navegação entre atos ---------- */
 function act(id){['ticket','cinema','museum','finale'].forEach(k=>$(k).hidden=k!==id)}
@@ -386,8 +334,8 @@ async function playTrailer(){
     const el=document.createElement('div');el.className='scene';el.innerHTML=c.h;
     if(c.foto){const im=await loadImg(c.foto);if(im){im.alt='';el.prepend(im)}}
     $('stage').innerHTML='';$('stage').appendChild(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
-    if(c.hit)boom(c.hit);say(c.v,{rate:.85,pitch:.6});
-    await new Promise(r=>setTimeout(r,reduce?900:c.d));if(run!==trailerRun)return;
+    if(c.hit)boom(c.hit);const ms=c.voz?await speak(c.voz,null,{rate:.85,pitch:.6}):0;
+    await new Promise(r=>setTimeout(r,reduce?900:Math.max(c.d,ms+400)));if(run!==trailerRun)return;
     el.classList.remove('on');await new Promise(r=>setTimeout(r,650));
   }
   if(run===trailerRun)enterMuseum();
@@ -395,6 +343,7 @@ async function playTrailer(){
 $('skip').onclick=()=>{trailerRun++;hush();enterMuseum()};
 
 /* ---------- museu ---------- */
+$('carta').innerHTML=CARTA.map(p=>`<p>${p}</p>`).join('');
 const rooms=$('rooms');let seen=new Set(),total=0,curRoom=0,auto=false,unlocked=0;
 SALAS.forEach((s,ri)=>{
   const r=document.createElement('div');r.className='room-w';r.style.setProperty('--wall',s.wall);r.dataset.i=ri;
@@ -469,20 +418,20 @@ function openWork(o){
   $('sheet').hidden=false;$('closeCard').focus();
   if(auto)speakWork();
 }
-function speakWork(){hush();const o=curWork;$('listen').textContent='A ouvir...';say(`Obra ${o.num}. ${o.t}. ${o.tech}. ${o.tx}`,{},()=>{$('listen').textContent='Ouvir outra vez'})}
+function speakWork(){hush();const o=curWork;$('listen').textContent='A ouvir...';speak(o.voz,falaObra(o,o.num),{},()=>{$('listen').textContent='Ouvir outra vez'})}
 $('listen').onclick=()=>{audio();speakWork()};
 $('closeCard').onclick=()=>{hush();$('sheet').hidden=true;if(curWork&&curWork.fin)finale()};
 $('readPaper').onclick=()=>{hush();$('sheet').hidden=true;$('paperWrap').hidden=false;$('paperWrap').scrollTop=0;tone(220,.3,'triangle',.05);buzz(20);loadImg('fotos/bebe.jpg').then(im=>{if(im){$('paperPic').innerHTML='';$('paperPic').appendChild(im)}})};
 $('closePaper').onclick=()=>{$('paperWrap').hidden=true};
 $('guide').onclick=()=>{auto=!auto;$('guide').classList.toggle('on',auto);$('guide').textContent=`Audioguia automático: ${auto?'ligado':'desligado'}`;if(auto)autoGuide();else hush()};
-function autoGuide(){hush();say(`Sala ${curRoom+1}. ${SALAS[curRoom].nome}.`)}
+function autoGuide(){hush();speak(SALAS[curRoom].voz)}
 
 /* ---------- final ---------- */
 function finale(){
   act('finale');$('finale').scrollTop=0;
   [523,659,784,1047,1319].forEach((f,k)=>tone(f,1.6,'sine',.07,k*.18));buzz([60,60,200]);
   if(!reduce)goldDust();
-  setTimeout(()=>say('Parabéns, madrinha. Gosto muito de ti.',{rate:.95,pitch:1}),1200);
+  setTimeout(()=>speak(FINAL_VOZ,null,{rate:.95,pitch:1}),1200);
 }
 function sendHref(){const t=`Livro de honra do Museu da Madrinha:\n\n${$('msg').value.trim()}\n\nCarolina`;$('send').href='https://wa.me/?text='+encodeURIComponent(t);return t}
 $('msg').addEventListener('input',sendHref);sendHref();

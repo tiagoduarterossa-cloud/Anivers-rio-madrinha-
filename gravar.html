@@ -1,0 +1,71 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Estúdio do curador</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: uma lista de falas, cada uma com o texto para ler e os botões de gravar, ouvir e guardar */
+:root{color-scheme:dark;--bg:#141210;--card:#211d19;--line:#3a332b;--ink:#f6f1e7;--muted:#b8ad9b;--rec:#e5484d;--ok:#46a758;--gold:#c49a4c;--serif:"Cormorant Garamond",Georgia,serif;--sans:"Work Sans",system-ui,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font:600 38px/1 var(--serif);margin:0}
+.lead{margin:0;color:var(--muted)}
+.how{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--muted)}
+.how ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.how b{color:var(--ink)}
+.prog{font:600 13px var(--sans);color:var(--gold)}
+h2{font:600 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 0}
+.line{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.line.done{border-color:var(--ok)}
+.line .id{font:600 12px ui-monospace,Menlo,monospace;color:var(--gold)}
+.line .tx{font:600 21px/1.35 var(--serif)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row button,.row a{font:600 14px var(--sans);border:0;border-radius:999px;padding:10px 16px;cursor:pointer;text-decoration:none;color:var(--ink);background:#332c25}
+.row .rec{background:var(--rec);color:#fff}
+.row .rec.on{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.row a.save{background:var(--ok);color:#06170b}
+.row .t{font:500 13px ui-monospace,Menlo,monospace;color:var(--muted)}
+.err{background:#3a1d1d;border:1px solid #6b2c2c;border-radius:12px;padding:12px 14px;font-size:14px}
+</style></head><body><div class="wrap">
+<h1>Estúdio do curador</h1>
+<p class="lead">Aqui gravas as falas do museu com a tua voz. Cada gravação substitui a voz sintética.</p>
+<div class="how"><b>Como fazer</b><ol>
+  <li>Abre esta página no telemóvel e vai para um sítio sem barulho.</li>
+  <li>Em cada fala, carrega em <b>Gravar</b>, lê o texto e carrega em <b>Parar</b>. Ouve e repete se quiseres.</li>
+  <li>Carrega em <b>Guardar</b>. O ficheiro sai já com o nome certo (por exemplo <b>t01.m4a</b>).</li>
+  <li>No fim, põe todos os ficheiros na pasta <b>audio/</b> do repositório (no GitHub: Add file, Upload files) ou envia-mos.</li>
+</ol><p style="margin:8px 0 0">No trailer fala devagar e com voz grave, como nos filmes. No audioguia, com ar de guia de museu muito sério.</p></div>
+<div class="prog" id="prog"></div>
+<div class="err" id="err" hidden></div>
+<div id="list"></div>
+</div>
+<script src="conteudo.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const FALAS=todasAsFalas();
+const MIME=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||'';
+const EXT=MIME.includes('mp4')?'m4a':MIME.includes('ogg')?'ogg':'webm';
+let stream=null,done=new Set();
+async function mic(){if(stream)return stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});return stream}catch(e){$('err').hidden=false;$('err').textContent='Não consegui usar o microfone. Confirma que deste autorização ao browser e que a página está aberta por https (GitHub Pages).';throw e}}
+function prog(){$('prog').textContent=`${done.size} de ${FALAS.length} falas gravadas`}
+let grupo='';
+FALAS.forEach(f=>{
+  if(f.grupo!==grupo){grupo=f.grupo;const h=document.createElement('h2');h.textContent=grupo;$('list').appendChild(h)}
+  const el=document.createElement('div');el.className='line';
+  el.innerHTML=`<div class="id">${f.id}.${EXT}</div><div class="tx"></div><div class="row"><button class="rec" type="button">Gravar</button><button class="play" type="button" hidden>Ouvir</button><a class="save" hidden>Guardar</a><span class="t"></span></div>`;
+  el.querySelector('.tx').textContent=f.texto;$('list').appendChild(el);
+  const rec=el.querySelector('.rec'),play=el.querySelector('.play'),save=el.querySelector('.save'),t=el.querySelector('.t');
+  let mr=null,chunks=[],url=null,t0=0,tick=null,audio=null;
+  rec.onclick=async()=>{
+    if(mr&&mr.state==='recording'){mr.stop();return}
+    const s=await mic();chunks=[];mr=new MediaRecorder(s,MIME?{mimeType:MIME}:undefined);
+    mr.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+    mr.onstop=()=>{clearInterval(tick);rec.classList.remove('on');rec.textContent='Gravar outra vez';
+      const blob=new Blob(chunks,{type:mr.mimeType||MIME||'audio/webm'});if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(blob);
+      audio=new Audio(url);play.hidden=false;save.hidden=false;save.href=url;save.download=`${f.id}.${EXT}`;done.add(f.id);el.classList.add('done');prog()};
+    mr.start();rec.classList.add('on');rec.textContent='Parar';t0=Date.now();tick=setInterval(()=>t.textContent=((Date.now()-t0)/1000).toFixed(1)+' s',100)};
+  play.onclick=()=>{if(audio){audio.currentTime=0;audio.play()}};
+});
+prog();
+if(!window.MediaRecorder){$('err').hidden=false;$('err').textContent='Este browser não consegue gravar. Usa o Safari ou o Chrome atualizados.'}
+</script></body></html>

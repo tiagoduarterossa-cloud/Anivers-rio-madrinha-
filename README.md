@@ -7,10 +7,15 @@ A prenda para os 38 anos da madrinha Carolina (22 de novembro). Junta três prot
 3. A sala 3 tem o "Diário da Família" de 22/11/1988 emoldurado, que abre inteiro.
 4. Na última sala está a nota do curador (a carta) e o livro de honra, que manda a mensagem dela por WhatsApp.
 
-Tudo está em `index.html`. No início do script:
+O conteúdo (textos, perguntas, cenas do trailer e a carta) está todo em `conteudo.js`:
 - `SALAS`: as salas, as obras e os textos do audioguia;
 - `PORTAS`: as perguntas e os códigos das portas;
-- `CENAS`: as cenas do trailer.
+- `CENAS`: as cenas do trailer;
+- `CARTA`: a nota do curador.
+
+## A tua voz
+
+Abre `gravar.html` no telemóvel (pelo GitHub Pages). Grava cada fala, carrega em Guardar e põe os ficheiros na pasta `audio/`. O museu usa as tuas gravações e, onde faltar alguma, a voz sintética.
 
 As fotografias vão para a pasta `fotos/`: `1.jpg` a `7.jpg` e `bebe.jpg` (a foto dela bebé, para o jornal). Sem foto, aparece uma pintura com um emoji.
 
