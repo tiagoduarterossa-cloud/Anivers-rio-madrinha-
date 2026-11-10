@@ -1,378 +1,355 @@
-<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Carolina 38 anos</title>
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Madrinha, o jogo</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;600;800&display=swap">
 <style>
 *,*::before,*::after{box-sizing:border-box}[hidden]{display:none!important}
-/* Layout: uma coluna estreita em cima do balcão da farmácia. Primeiro a caixa fechada, depois o blister e o folheto */
+/* Layout: ecrã inteiro de jogo. Um canvas por trás, cartões por cima entre níveis */
 :root{
-  color-scheme:light;
-  --counter:#dfe7ea;     /* balcão */
-  --paper:#fcfdfd;       /* cartão da caixa */
-  --ink:#16243a;
-  --muted:#5b6a7a;
-  --blue:#1f4c9c;        /* faixa do laboratório */
-  --rose:#e2416c;        /* a dose: 38 */
-  --foil:#c7cdd4;
-  --line:#d6dde3;
-  --display:"Archivo",ui-sans-serif,system-ui,sans-serif;
-  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+  --night:#120e2a;
+  --ink:#fff7ee;
+  --dim:#c9bfe6;
+  --gold:#ffc94a;
+  --pink:#ff5d8f;
+  --card:rgba(24,18,52,.86);
+  --display:"Unbounded",ui-sans-serif,system-ui,sans-serif;
+  --body:"Manrope",ui-sans-serif,system-ui,sans-serif;
 }
-html,body{min-height:100%}
-body{margin:0;background:var(--counter);color:var(--ink);font:16px/1.5 var(--body);
-  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 64px);
-  padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
-button{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--rose);outline-offset:3px}
-.btn{font:700 16px var(--body);background:var(--blue);color:#fff;border:0;border-radius:999px;padding:14px 22px;cursor:pointer;align-self:center;box-shadow:0 6px 0 #133672}
-.btn:active{transform:translateY(3px);box-shadow:0 3px 0 #133672}
-.btn.ghost{background:transparent;color:var(--blue);box-shadow:none;border:2px solid var(--blue);padding:10px 18px;font-size:14px}
-.hint{margin:0;text-align:center;color:var(--muted);font-size:14px}
-
-/* ---------- caixa ---------- */
-.stage{perspective:1100px;display:flex;flex-direction:column;align-items:stretch}
-.lid{height:34px;background:var(--paper);border-radius:6px 6px 0 0;transform-origin:50% 100%;transition:transform .9s cubic-bezier(.5,0,.2,1);
-  display:flex;align-items:center;justify-content:center;font:600 10px var(--mono);letter-spacing:.2em;color:var(--muted);border-bottom:1px dashed var(--line);position:relative;z-index:2}
-.open .lid{transform:rotateX(-165deg)}
-.front{background:var(--paper);border-radius:0 0 6px 6px;box-shadow:0 22px 40px rgba(22,36,58,.22),0 2px 0 rgba(22,36,58,.05);overflow:hidden;display:grid;grid-template-columns:1fr 22px;position:relative}
-.front .main{padding:20px 20px 18px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.band{background:var(--blue);background-image:linear-gradient(var(--rose) 0 30%,var(--blue) 30%)}
-.lab{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
-.brand{font-family:var(--display);font-weight:800;font-stretch:72%;font-size:clamp(52px,17vw,76px);line-height:.9;letter-spacing:-.01em;margin:10px 0 0}
-.brand sup{font-size:.28em;font-weight:500;vertical-align:top;position:relative;top:.35em;margin-left:2px}
-.dose{display:flex;align-items:baseline;gap:8px;margin-top:2px}
-.dose b{font-family:var(--display);font-weight:900;font-stretch:100%;font-size:clamp(40px,13vw,56px);line-height:1;color:var(--rose)}
-.dose span{font:500 15px var(--body);color:var(--ink)}
-.form{margin:10px 0 0;font-size:15px}
-.form em{display:block;font-style:normal;color:var(--muted);font-size:13px}
-.meta{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
-.qty{font:700 13px var(--body)}
-.braille{font-size:18px;letter-spacing:.12em;color:#9aa5b1;line-height:1}
-.legal{font-size:11px;color:var(--muted);margin:8px 0 0}
-.codes{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-top:10px;font:400 10px/1.4 var(--mono);color:var(--muted);flex-wrap:wrap}
-.barcode{height:30px;width:112px;background:repeating-linear-gradient(90deg,var(--ink) 0 1px,transparent 1px 3px,var(--ink) 3px 5px,transparent 5px 6px,var(--ink) 6px 7px,transparent 7px 10px,var(--ink) 10px 13px,transparent 13px 14px)}
-.open .front{animation:drop .6s .7s ease-in forwards}
-@keyframes drop{to{transform:translateY(30px) scale(.96);opacity:0}}
-
-/* ---------- blister ---------- */
-.section-title{font-family:var(--display);font-weight:800;font-stretch:80%;font-size:30px;line-height:1;margin:0;text-wrap:balance}
-.kicker{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin:0 0 6px}
-.blister{background:linear-gradient(135deg,#e6e9ee,#c9cfd7 40%,#eef1f4 60%,#c3c9d2);border-radius:14px;padding:16px;box-shadow:0 14px 30px rgba(22,36,58,.18),inset 0 1px 0 #fff;position:relative}
-.blister::before{content:"CAROLINA 38 · CAROLINA 38 · CAROLINA 38 · CAROLINA 38 · CAROLINA 38 · CAROLINA 38 · CAROLINA 38 · CAROLINA 38";position:absolute;inset:6px 10px auto;font:600 8px var(--mono);letter-spacing:.2em;color:rgba(22,36,58,.25);white-space:nowrap;overflow:hidden}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:10px}
-.pill{aspect-ratio:1;border:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#dfe3e8 70%);box-shadow:inset 0 -3px 6px rgba(0,0,0,.12),0 2px 3px rgba(0,0,0,.12);cursor:pointer;position:relative;display:grid;place-items:center;padding:0;max-width:100%}
-.pill::after{content:"";width:62%;height:34%;border-radius:999px;background:linear-gradient(90deg,var(--rose) 50%,#fff 50%);box-shadow:inset 0 -2px 3px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.2);transform:rotate(-28deg)}
-.pill:hover::after{transform:rotate(-28deg) scale(1.08)}
-.pill:active{transform:scale(.92)}
-.pill.taken,.pill.missing{cursor:default;background:radial-gradient(circle,#56606c 0 52%,#8d96a1 58%,transparent 62%),radial-gradient(circle at 35% 30%,#f3f5f7,#d5dae0 70%);box-shadow:inset 0 2px 5px rgba(0,0,0,.35)}
-.pill.taken::after,.pill.missing::after{display:none}
-.counter{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;font:600 12px var(--mono);color:var(--ink)}
-.counter .bar{flex:1;height:6px;border-radius:3px;background:rgba(22,36,58,.15);margin:0 10px;overflow:hidden;align-self:center}
-.counter .bar i{display:block;height:100%;width:0;background:var(--rose);transition:width .3s}
-.note{font-size:12px;color:var(--muted);margin:8px 0 0;font-style:italic}
-.dispense{background:var(--paper);border-radius:12px;padding:16px 18px;box-shadow:0 8px 20px rgba(22,36,58,.12);min-height:104px;display:flex;flex-direction:column;gap:4px;border-left:5px solid var(--rose)}
-.dispense small{font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.dispense p{margin:0;font-size:18px;line-height:1.4;text-wrap:pretty}
-.dispense.pop{animation:pop .35s ease-out}
-.dispense.last{border-left-color:var(--blue);background:#fff}
-.dispense.last p{font-family:var(--display);font-weight:800;font-stretch:85%;font-size:24px;line-height:1.15;color:var(--blue)}
-@keyframes pop{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
-.flyer{position:fixed;width:28px;height:12px;border-radius:999px;background:linear-gradient(90deg,var(--rose) 50%,#fff 50%);box-shadow:0 2px 4px rgba(0,0,0,.25);pointer-events:none;z-index:20;transition:transform .7s cubic-bezier(.2,.8,.3,1),opacity .7s}
-
-/* ---------- folheto ---------- */
-.leaflet{background:#fff;border-radius:4px;box-shadow:0 14px 34px rgba(22,36,58,.18);position:relative;overflow:hidden}
-.leaflet .cover{padding:22px 20px;display:flex;flex-direction:column;gap:12px;align-items:flex-start;
-  background:repeating-linear-gradient(180deg,transparent 0 calc(25% - 1px),rgba(22,36,58,.08) calc(25% - 1px) 25%)}
-.leaflet .cover h2{margin:0;font:700 13px var(--body);letter-spacing:.08em;text-transform:uppercase}
-.leaflet .cover p{margin:0;font-size:14px;color:var(--muted)}
-.leaflet .cover .btn{align-self:flex-start}
-.doc{padding:4px 20px 26px;font-size:15px;line-height:1.55}
-.doc.unfold>*{animation:unfold .55s ease-out both}
-.doc.unfold>*:nth-child(2){animation-delay:.08s}.doc.unfold>*:nth-child(3){animation-delay:.16s}.doc.unfold>*:nth-child(4){animation-delay:.24s}
-@keyframes unfold{from{opacity:0;transform:perspective(600px) rotateX(-35deg);transform-origin:top}to{opacity:1;transform:none}}
-.doc h3{font:700 16px/1.3 var(--body);margin:24px 0 8px;padding-top:14px;border-top:2px solid var(--ink)}
-.doc h3 span{color:var(--blue);margin-right:6px}
-.doc h4{font:700 15px var(--body);margin:14px 0 4px}
-.doc p{margin:0 0 10px}
-.doc ul{margin:0 0 10px;padding-left:20px}
-.doc li{margin-bottom:4px}
-.doc .box{border:1.5px solid var(--ink);padding:12px 14px;margin:14px 0;font-size:14px}
-.doc .box p:last-child,.doc .box ul:last-child{margin-bottom:0}
-.doc .title{font:800 24px/1.1 var(--display);font-stretch:85%;margin:14px 0 2px}
-.doc .sub{font-size:14px;color:var(--muted);margin-bottom:6px}
-.doc .toc{list-style:none;padding:0;font-size:14px}
-.freq{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin:8px 0 12px}
-.freq div{border-left:3px solid var(--line);padding-left:10px}
-.freq b{display:block;font-size:13px}
-.freq small{display:block;font-size:12px;color:var(--muted)}
-.report{margin:4px 0 8px}
-.report-out{background:#f1f5fb;border:1px solid #c9d6ea;border-radius:8px;padding:12px 14px;font-size:14px;margin-top:10px}
-.report-out b{font-family:var(--mono);font-size:12px;letter-spacing:.06em}
-.compo{background:#fff6f8;border-left:4px solid var(--rose);padding:16px 16px 6px;margin:12px 0 14px}
-.compo .letter{font-size:17px;line-height:1.6}
-.compo .sign{font-family:var(--display);font-weight:800;font-stretch:85%;font-size:22px;color:var(--rose);margin-top:6px}
-.small{font-size:13px;color:var(--muted)}
-.mono{font-family:var(--mono);font-size:12px}
-#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+body{background:var(--night);color:var(--ink);font:16px/1.5 var(--body);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 12px) max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:2}
+.hud .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.hud .lv{font:700 11px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.hud .tt{font:900 18px var(--display)}
+.hud .sc{font:800 16px var(--body);font-variant-numeric:tabular-nums}
+.meter{height:10px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,var(--gold),var(--pink));box-shadow:0 0 12px var(--pink);transition:width .25s}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px));overflow-y:auto}
+.card{width:100%;max-width:420px;background:var(--card);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 30px 60px rgba(0,0,0,.45);animation:in .5s cubic-bezier(.2,.9,.3,1.2);margin:auto}
+@keyframes in{from{opacity:0;transform:translateY(24px) scale(.96)}}
+.eyebrow{font:700 11px var(--display);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0}
+h1,h2{font-family:var(--display);font-weight:900;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,12vw,56px)}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--gold),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:clamp(28px,8.5vw,36px)}
+.card p{margin:0;font-size:17px;line-height:1.55;text-wrap:pretty}
+.card .small{font-size:14px;color:var(--dim)}
+.items{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;color:var(--dim)}
+.items span{display:flex;align-items:center;gap:6px}
+.items b{font-size:28px;line-height:1}
+.btn{font:700 17px var(--display);letter-spacing:.02em;color:#2a0f1c;background:linear-gradient(90deg,var(--gold),var(--pink));border:0;border-radius:999px;padding:16px 24px;cursor:pointer;box-shadow:0 8px 24px rgba(255,93,143,.4);align-self:stretch}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid rgba(255,255,255,.35);box-shadow:none;font-size:14px;padding:12px 18px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.row2{display:flex;gap:10px;flex-wrap:wrap}
+.row2 .btn{flex:1;min-width:140px}
+.cakehud{position:fixed;left:0;right:0;bottom:0;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 18px) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;gap:10px;z-index:3;text-align:center}
+.cakehud p{margin:0;font:800 16px var(--body);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.cakehud .big{font:900 22px var(--display)}
+.mic{width:100%;max-width:300px;height:8px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
+.mic i{display:block;height:100%;width:0;background:var(--gold)}
+.letter p{font-size:17px}
+.letter .sign{font:900 22px var(--display);color:var(--pink)}
+.toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font:900 clamp(26px,8vw,40px) var(--display);text-align:center;z-index:4;pointer-events:none;text-shadow:0 4px 20px rgba(0,0,0,.5);animation:pop 1.1s ease-out forwards;width:90%}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
-<canvas id="confetti" aria-hidden="true"></canvas>
-<div class="wrap">
+<canvas id="game" aria-hidden="true"></canvas>
 
-  <!-- 1. Caixa fechada -->
-  <section id="closed" class="stage" aria-label="Embalagem">
-    <div class="lid" aria-hidden="true">ABRIR AQUI ▲</div>
-    <div class="front">
-      <div class="main">
-        <div class="lab">Breda Farmacêutica · Edição única</div>
-        <h1 class="brand">Carolina<sup>®</sup></h1>
-        <div class="dose"><b>38</b><span>anos</span></div>
-        <p class="form">Comprimidos revestidos por carinho<em>Via oral, não. Via abraço.</em></p>
-        <div class="meta">
-          <span class="qty">38 comprimidos</span>
-          <span class="braille" aria-label="Carolina em braille">⠉⠁⠗⠕⠇⠊⠝⠁ ⠼⠉⠓</span>
-        </div>
-        <p class="legal">Medicamento não sujeito a receita médica. Dispensado com amor pelo afilhado.</p>
-        <div class="codes">
-          <span>Lote 22.11.1988<br>Val. sem prazo<br>CNP 3822112</span>
-          <span class="barcode" aria-hidden="true"></span>
-        </div>
-      </div>
-      <div class="band" aria-hidden="true"></div>
+<div class="hud" id="hud" hidden>
+  <div class="row"><span><span class="lv" id="hLv"></span><br><span class="tt" id="hTt"></span></span><span class="sc" id="hSc"></span></div>
+  <div class="meter"><i id="hBar"></i></div>
+</div>
+
+<div class="cakehud" id="cakehud" hidden>
+  <p class="big" id="cLeft">38 velas acesas</p>
+  <p id="cHow">Sopra para o microfone do telemóvel</p>
+  <div class="mic" id="micbar"><i id="micLvl"></i></div>
+</div>
+
+<!-- ecrã inicial -->
+<div class="overlay" id="start">
+  <div class="card">
+    <p class="eyebrow">Edição especial 38 anos</p>
+    <h1>Madrinha<br><em>o jogo</em></h1>
+    <p>Feito de propósito para uma única jogadora: a madrinha Carolina. Três níveis da vida do teu afilhado e um nível final que só se passa com fôlego.</p>
+    <p class="small">Liga o som. Segura o telemóvel na vertical e inclina-o para os lados para mexer o cesto. Também dá com o dedo.</p>
+    <button class="btn" id="play" type="button">Jogar</button>
+  </div>
+</div>
+
+<!-- introdução de nível -->
+<div class="overlay" id="intro" hidden>
+  <div class="card">
+    <p class="eyebrow" id="iLv"></p>
+    <h2 id="iTt"></h2>
+    <p id="iTx"></p>
+    <div class="items" id="iItems"></div>
+    <button class="btn" id="go" type="button">Começar</button>
+  </div>
+</div>
+
+<!-- fim de nível -->
+<div class="overlay" id="clear" hidden>
+  <div class="card">
+    <p class="eyebrow" id="kLv"></p>
+    <h2>Nível completo</h2>
+    <p id="kTx"></p>
+    <button class="btn" id="next" type="button">Continuar</button>
+  </div>
+</div>
+
+<!-- antes do bolo -->
+<div class="overlay" id="cakeIntro" hidden>
+  <div class="card">
+    <p class="eyebrow">Nível final</p>
+    <h2>38 velas</h2>
+    <p>Este nível não se passa com os dedos. Vais precisar de pulmões.</p>
+    <p class="small">O telemóvel vai pedir para usar o microfone. É só para ouvir o sopro, não grava nada.</p>
+    <div class="row2">
+      <button class="btn" id="blow" type="button">Acender as velas</button>
     </div>
-  </section>
-  <button class="btn" id="openBtn" type="button">Abrir a embalagem</button>
-  <p class="hint" id="openHint">Antes de tomar, leia com atenção. Ou não.</p>
+    <button class="btn ghost" id="tapMode" type="button">Não quero usar o microfone</button>
+  </div>
+</div>
 
-  <!-- 2. Dentro da caixa -->
-  <section id="inside" hidden aria-label="Conteúdo da embalagem" style="display:flex;flex-direction:column;gap:18px">
-    <div>
-      <p class="kicker">Posologia: um de cada vez</p>
-      <h2 class="section-title">Toca num comprimido para o tirar do blister</h2>
-    </div>
-    <div class="blister">
-      <div class="grid" id="grid"></div>
-      <div class="counter"><span id="taken">0 de 38</span><span class="bar"><i id="bar"></i></span><span>tomados</span></div>
-      <p class="note">Faltam dois comprimidos. Foram testados pelo afilhado, por razões de segurança.</p>
-    </div>
-    <div class="dispense" id="dispense" aria-live="polite">
-      <small id="dnum">À espera da primeira dose</small>
-      <p id="dtext">Cada comprimido traz uma coisa diferente. O último é especial.</p>
-    </div>
-
-    <article class="leaflet" aria-label="Folheto informativo">
-      <div class="cover" id="cover">
-        <h2>Folheto informativo</h2>
-        <p>Dobrado em quatro, como todos. Ninguém o consegue voltar a dobrar como estava.</p>
-        <button class="btn ghost" id="unfoldBtn" type="button">Desdobrar o folheto</button>
-      </div>
-      <div class="doc" id="doc" hidden>
-        <div>
-          <p class="mono">Folheto informativo: Informação para o utilizador</p>
-          <p class="title">Carolina 38 anos, comprimidos revestidos por carinho</p>
-          <p class="sub">Substância ativa: Carolina Breda</p>
-          <div class="box">
-            <p><b>Leia com atenção todo este folheto antes de começar a tomar este medicamento, pois contém informação importante para si.</b></p>
-            <ul>
-              <li>Conserve este folheto. Pode ter necessidade de o ler novamente, sobretudo a secção 6.</li>
-              <li>Caso ainda tenha dúvidas, fale com o seu afilhado.</li>
-              <li>Este medicamento foi receitado apenas para si. Não o deve dar a outros. Não há stock.</li>
-              <li>Se tiver quaisquer efeitos indesejáveis, incluindo efeitos não indicados neste folheto, ria-se. Ver secção 4.</li>
-            </ul>
-          </div>
-          <p><b>O que contém este folheto</b></p>
-          <ol class="toc">
-            <li>1. O que é Carolina e para que é utilizada</li>
-            <li>2. O que precisa de saber antes de tomar Carolina</li>
-            <li>3. Como tomar Carolina</li>
-            <li>4. Efeitos indesejáveis possíveis</li>
-            <li>5. Como conservar Carolina</li>
-            <li>6. Conteúdo da embalagem e outras informações</li>
-          </ol>
-        </div>
-
-        <div>
-          <h3><span>1.</span>O que é Carolina e para que é utilizada</h3>
-          <p>Carolina pertence a um grupo de medicamentos chamados madrinhas. Atua diretamente no coração da família e começa a fazer efeito logo no batizado.</p>
-          <p>Carolina é utilizada no tratamento de:</p>
-          <ul>
-            <li>tardes de domingo sem nada para fazer;</li>
-            <li>joelhos esfolados e outras crises da infância;</li>
-            <li>falta de presentes no Natal e nos anos;</li>
-            <li>situações em que os pais disseram que não;</li>
-            <li>saudades, em todas as suas formas.</li>
-          </ul>
-
-          <h3><span>2.</span>O que precisa de saber antes de tomar Carolina</h3>
-          <h4>Não tome Carolina</h4>
-          <ul><li>se tem alergia a abraços. Até à data não foi registado nenhum caso.</li></ul>
-          <h4>Advertências e precauções</h4>
-          <p>Carolina pode dizer "estás tão crescido" em todos os encontros, mesmo que a última vez tenha sido na semana passada. Isto é normal e não requer tratamento.</p>
-          <h4>Outros medicamentos e Carolina</h4>
-          <p>Carolina é compatível com avós, tios, primos e almoços de família que começam ao meio-dia e acabam ao jantar.</p>
-          <h4>Carolina com alimentos e bebidas</h4>
-          <p>Recomenda-se tomar com bolo. Sem bolo, o efeito pode ser reduzido.</p>
-          <h4>Condução de veículos</h4>
-          <p>Carolina não afeta a capacidade de conduzir. Pode afetar a escolha da música no carro.</p>
-        </div>
-
-        <div>
-          <h3><span>3.</span>Como tomar Carolina</h3>
-          <p>Tome este medicamento exatamente como indicado pelo seu afilhado.</p>
-          <div class="box">
-            <p><b>Dose recomendada</b><br>Um abraço de manhã. Dois em dias de festa. Não existe dose máxima.</p>
-          </div>
-          <h4>Se tomar mais Carolina do que deveria</h4>
-          <p>Não existem casos de sobredosagem. Os sintomas mais comuns são sorrisos e fotografias a mais.</p>
-          <h4>Caso se tenha esquecido de tomar Carolina</h4>
-          <p>Ligue-lhe. Não tome uma dose a dobrar para compensar. Aliás, tome.</p>
-          <h4>Se parar de tomar Carolina</h4>
-          <p>Não pare.</p>
-
-          <h3><span>4.</span>Efeitos indesejáveis possíveis</h3>
-          <p>Como todos os medicamentos, Carolina pode causar efeitos indesejáveis, embora estes não se manifestem em todas as pessoas.</p>
-          <div class="freq">
-            <div><b>Muito frequentes</b><small>podem afetar mais de 1 em cada 10 pessoas</small>Beijinhos não solicitados. Fotografias em todos os encontros. Perguntas sobre a escola.</div>
-            <div><b>Frequentes</b><small>podem afetar até 1 em cada 10 pessoas</small>Presentes acima do orçamento. Histórias embaraçosas contadas à mesa, à frente de toda a gente.</div>
-            <div><b>Raros</b><small>podem afetar até 1 em cada 1000 pessoas</small>Mau humor. Dura pouco e passa com café.</div>
-            <div><b>Muito raros</b><small>podem afetar até 1 em cada 10 000 pessoas</small>Dizer que não ao afilhado.</div>
-            <div><b>Desconhecido</b><small>a frequência não pode ser calculada a partir dos dados disponíveis</small>Quanto carinho cabe numa só pessoa.</div>
-          </div>
-          <h4>Comunicação de efeitos indesejáveis</h4>
-          <p>Se tiver quaisquer efeitos indesejáveis, pode comunicá-los diretamente ao afilhado responsável.</p>
-          <button class="btn ghost report" id="reportBtn" type="button">Comunicar um efeito indesejável</button>
-          <div class="report-out" id="reportOut" hidden aria-live="polite">
-            <b>NOTIFICAÇÃO Nº 0038 · ANALISADA</b><br>
-            O afilhado responsável analisou a sua notificação. Conclusão: o efeito é conhecido, é permanente e não tem cura. Recomendação: continuar a tomar.
-          </div>
-        </div>
-
-        <div>
-          <h3><span>5.</span>Como conservar Carolina</h3>
-          <p>Manter este medicamento ao alcance e à vista das crianças, em especial dos afilhados.</p>
-          <p>Conservar à temperatura ambiente, de preferência ao sol e numa esplanada.</p>
-          <p>Não utilize este medicamento após o prazo de validade. Carolina não tem prazo de validade.</p>
-          <p>Não deite Carolina fora. Nunca.</p>
-
-          <h3><span>6.</span>Conteúdo da embalagem e outras informações</h3>
-          <h4>Qual a composição de Carolina</h4>
-          <p>A substância ativa é Carolina Breda, 38 anos.</p>
-          <p>Os outros componentes são paciência (quantidade suficiente para aturar um afilhado), gargalhadas, colo, conselhos que só se percebem mais tarde e uma presença que nunca falhou.</p>
-          <div class="compo">
-            <p class="letter">Os pais escolhem a madrinha num só dia. Tu escolheste continuar a ser a minha em todos os outros. Nos anos, no Natal e nas tardes em que mais ninguém tinha tempo e tu tinhas.</p>
-            <p class="letter">Nem sempre digo isto, porque são coisas que custam a dizer em voz alta. Por isso escrevi-as num folheto, que é onde se põe a informação mais importante.</p>
-            <p class="letter">Parabéns, madrinha. Gosto muito de ti.</p>
-            <p class="sign">O teu afilhado, Tiago</p>
-          </div>
-          <h4>Qual o aspeto de Carolina e conteúdo da embalagem</h4>
-          <p>Embalagem de 38 comprimidos em blister. Um ano por comprimido. Os anos seguintes são fornecidos em embalagens de recarga, uma por ano, para sempre.</p>
-          <h4>Titular da Autorização de Introdução no Mercado</h4>
-          <p>Os meus pais, que te escolheram. Escolheram bem.</p>
-          <p class="small">Este folheto foi revisto pela última vez em 22 de novembro de 2026.</p>
-        </div>
-      </div>
-    </article>
-  </section>
+<!-- final -->
+<div class="overlay" id="end" hidden>
+  <div class="card letter">
+    <p class="eyebrow">Jogo completo · 100%</p>
+    <h2>Parabéns, madrinha Carolina</h2>
+    <p>Ganhaste. Isso eu já sabia, porque contigo nunca perdi nada.</p>
+    <p>Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros. Nos anos, no Natal e nas tardes em que mais ninguém tinha tempo e tu arranjavas.</p>
+    <p>Não digo isto muitas vezes, por isso fiz-te um jogo. É mais fácil programar do que dizer em voz alta.</p>
+    <p>Gosto muito de ti.</p>
+    <p class="sign">O teu afilhado, Tiago</p>
+    <button class="btn ghost" id="again" type="button">Jogar outra vez</button>
+  </div>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// 37 frases baralhadas + a última, que sai sempre no fim
-const DOSES=[
-  "Este comprimido vale um abraço. Reclamar junto do afilhado.",
-  "Vale uma fatia extra de bolo. Hoje as calorias não contam.",
-  "Contém 100% da dose diária recomendada de madrinha.",
-  "Hoje a loiça não é contigo.",
-  "38 não é uma idade. É a versão 38.0, com melhorias de desempenho.",
-  "Este dá direito a escolher a música no carro. Sem protestos.",
-  "Pode provocar fotografias de família em que alguém tem sempre os olhos fechados.",
-  "Vale um \"tinhas razão\". Usar com moderação, é raro.",
-  "Ser madrinha não acaba no batizado. Tu provaste isso todos os anos.",
-  "Vale uma sesta sem interrupções.",
-  "Está provado: as madrinhas não envelhecem. Ganham experiência.",
-  "Vale um elogio do afilhado sem segundas intenções. Quase.",
-  "Contém vestígios de saudade do tempo em que eu cabia no teu colo.",
-  "Pedido de desculpa oficial por todas as vezes que te sujei a roupa em bebé.",
-  "Tomar com bolo. Sem bolo não faz efeito.",
-  "Vale uma hora de conversa sem telemóveis. Eu também desligo o meu. Talvez.",
-  "Dá direito a contar uma história embaraçosa da minha infância. Só uma.",
-  "Obrigado por teres aceitado o cargo sem saberes no que te estavas a meter.",
-  "Vale um pequeno-almoço feito por mim. Resultado não garantido.",
-  "Dose de reforço: és das pessoas mais importantes da minha vida.",
-  "Válido para um dia inteiro sem ninguém te perguntar o que há para jantar.",
-  "Atenção: abraçar o afilhado pode criar dependência.",
-  "Este é um placebo. Mas acreditaste, por isso funciona na mesma.",
-  "Vale um brinde. Levanta o copo agora mesmo.",
-  "A madrinha é a pessoa que os pais escolhem para os dias em que eles não chegam. Escolheram bem.",
-  "Vale um \"gosto muito de ti\" ao vivo. Exige-o hoje.",
-  "Hoje ganhas todas as discussões. Na verdade já ganhavas.",
-  "Vale uma selfie com o afilhado. Ele não pode recusar.",
-  "Contraindicado para quem não gosta de ser mimada. Azar, hoje vais ser.",
-  "38 voltas ao sol e continuas a brilhar mais do que ele.",
-  "Efeito prolongado: dura até aos 39. Depois renova-se automaticamente.",
-  "Vale um pedido à escolha. Dentro do razoável. Mais ou menos.",
-  "Quem tem madrinha tem sempre para onde ir.",
-  "Vale um jantar em que eu pago. Guarda este comprimido, vais precisar de prova.",
-  "Pode causar riso descontrolado em almoços de família. Não procure tratamento.",
-  "Garantia vitalícia. Sem letras pequenas.",
-  "Este comprimido não faz nada. Só queria dizer olá."
+// ---------- níveis ----------
+const LEVELS=[
+  {title:'O batizado',sky:['#1a1446','#4b2c86'],speed:1,
+   intro:'Ano zero. Aceitaste ser madrinha sem saberes no que te estavas a meter. O bebé atira tudo ao chão. Apanha.',
+   good:['🍼','🧸','🎀','🍪'],bad:['💩'],badTip:'fralda suja, evitar',
+   done:'O padre molhou o bebé. O bebé molhou-te a ti. Foi um bom começo.'},
+  {title:'A infância',sky:['#07324a','#127a86'],speed:1.25,
+   intro:'Anos, Natais e tardes de domingo. Os presentes estão a cair do céu. Não deixes nenhum chegar ao chão.',
+   good:['🎁','🍦','🎈','🧁'],bad:['📚'],badTip:'trabalhos de casa, evitar',
+   done:'Nunca houve um ano sem um presente teu. Nem um. Eu contei.'},
+  {title:'A adolescência',sky:['#3a0f33','#9b2e52'],speed:1.55,
+   intro:'O afilhado cresceu e agora só tem fome. Apanha comida, muita comida, o mais depressa possível.',
+   good:['🍕','🍔','🍟','🍩'],bad:['🥦'],badTip:'brócolos, ele não come',
+   done:'Já sou mais alto do que tu e continuo a precisar de ti. Isso não vai mudar.'}
 ];
-const FINAL="Último comprimido. Obrigado por estares sempre lá. Sempre. Parabéns, madrinha.";
-const queue=DOSES.slice().sort(()=>Math.random()-.5);
-let count=0;
+const TARGET=10;
 
-// blister: 40 alvéolos, os dois primeiros já vazios
-const grid=$('grid');
-for(let k=0;k<40;k++){
-  const b=document.createElement('button');b.type='button';b.className='pill';
-  if(k===0||k===7){b.classList.add('missing');b.disabled=true;b.setAttribute('aria-label','Alvéolo vazio')}
-  else{b.setAttribute('aria-label','Comprimido');b.onclick=()=>take(b)}
-  grid.appendChild(b);
+// ---------- canvas ----------
+const cv=$('game'),ctx=cv.getContext('2d');let W=0,H=0,DPR=1;
+function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);if(mode==='cake')layoutCake()}
+addEventListener('resize',resize);
+
+// estrelas de fundo (paralaxe)
+const stars=Array.from({length:120},()=>({x:Math.random(),y:Math.random(),z:Math.random()*.8+.2,t:Math.random()*6}));
+let skyTarget=['#120e2a','#2a1f5c'],skyRGB=skyTarget.map(h=>hex(h));
+
+// ---------- som, vibração, voz ----------
+let ac=null;
+function audio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){}}
+function tone(f,d,type='sine',v=.12,when=0){if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}
+const sGood=()=>{tone(880+Math.random()*200,.12,'triangle',.12);tone(1320,.1,'sine',.06,.05)};
+const sBad=()=>{tone(160,.3,'sawtooth',.08);tone(120,.3,'square',.05,.05)};
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+function say(t){try{const s=speechSynthesis;if(!s||!window.SpeechSynthesisUtterance)return;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';
+  const v=s.getVoices().find(x=>/pt[-_]PT/i.test(x.lang))||s.getVoices().find(x=>/^pt/i.test(x.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
+function parabens(){ // "Parabéns a você", melodia tradicional
+  if(!ac)return;const N={G4:392,A4:440,B4:494,C5:523,D5:587,E5:659,F5:698,G5:784};
+  const m=[['G4',.75],['G4',.25],['A4',1],['G4',1],['C5',1],['B4',2],['G4',.75],['G4',.25],['A4',1],['G4',1],['D5',1],['C5',2],
+           ['G4',.75],['G4',.25],['G5',1],['E5',1],['C5',1],['B4',1],['A4',2],['F5',.75],['F5',.25],['E5',1],['C5',1],['D5',1],['C5',3]];
+  let t=0;const b=.38;m.forEach(([n,d])=>{tone(N[n],d*b*.95,'triangle',.11,t);tone(N[n]/2,d*b*.9,'sine',.05,t);t+=d*b});
 }
 
-$('openBtn').onclick=()=>{
-  $('closed').classList.add('open');$('openBtn').disabled=true;
-  setTimeout(()=>{$('closed').hidden=true;$('openBtn').hidden=true;$('openHint').hidden=true;$('inside').hidden=false;scrollTo({top:0,behavior:reduce?'auto':'smooth'})},reduce?0:1350);
-};
+// ---------- controlo: inclinação ou dedo ----------
+let tilt=null,pointerX=null,keys=0;
+addEventListener('deviceorientation',e=>{if(e.gamma!=null)tilt=e.gamma});
+cv.addEventListener('pointerdown',e=>{pointerX=e.clientX;if(mode==='cake'&&tapOnly)tapCandles(e.clientX,e.clientY)});
+cv.addEventListener('pointermove',e=>{if(e.buttons||e.pointerType==='touch'){pointerX=e.clientX;if(mode==='cake'&&tapOnly)tapCandles(e.clientX,e.clientY)}});
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')keys=-1;if(e.key==='ArrowRight')keys=1});
+addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight')keys=0});
+async function askTilt(){try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')await DeviceOrientationEvent.requestPermission()}catch(e){}}
 
-function take(b){
-  if(b.classList.contains('taken'))return;
-  b.classList.add('taken');b.disabled=true;b.setAttribute('aria-label','Comprimido tomado');count++;
-  if(!reduce)fly(b);
-  const last=count===38,txt=last?FINAL:queue[count-1];
-  const d=$('dispense');d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop');d.classList.toggle('last',last);
-  $('dnum').textContent=last?'Comprimido 38 de 38':`Comprimido ${count} de 38`;$('dtext').textContent=txt;
-  $('taken').textContent=`${count} de 38`;$('bar').style.width=(count/38*100)+'%';
-  if(last&&!reduce)confetti();
-  if(count===1||last)d.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
-}
-function fly(b){
-  const r=b.getBoundingClientRect(),f=document.createElement('div');f.className='flyer';
-  f.style.left=(r.left+r.width/2-14)+'px';f.style.top=(r.top+r.height/2-6)+'px';document.body.appendChild(f);
-  requestAnimationFrame(()=>{f.style.transform=`translate(${(Math.random()-.5)*120}px,-140px) rotate(${Math.random()*540-270}deg)`;f.style.opacity='0'});
-  setTimeout(()=>f.remove(),800);
-}
+// ---------- estado ----------
+let mode='menu',lv=0,score=0,items=[],parts=[],floats=[],basket={x:0,vx:0},shake=0,spawnT=0,last=0;
 
-$('unfoldBtn').onclick=()=>{$('cover').hidden=true;const d=$('doc');d.hidden=false;d.classList.add('unfold')};
-$('reportBtn').onclick=()=>{$('reportOut').hidden=false;$('reportBtn').hidden=true};
-
-function confetti(){
-  const c=$('confetti'),x=c.getContext('2d'),dpr=devicePixelRatio||1;
-  c.width=innerWidth*dpr;c.height=innerHeight*dpr;x.setTransform(dpr,0,0,dpr,0,0);
-  const cols=['#e2416c','#1f4c9c','#ffffff','#f3b8c8'];
-  const ps=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight*.6,vx:(Math.random()-.5)*13,vy:-Math.random()*14-5,r:Math.random()*6,vr:(Math.random()-.5)*.3,a:cols[Math.random()*4|0],b:cols[Math.random()*4|0]}));
-  let f=0;(function tick(){
-    x.clearRect(0,0,innerWidth,innerHeight);
-    ps.forEach(p=>{p.vy+=.33;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;x.save();x.translate(p.x,p.y);x.rotate(p.r);
-      x.fillStyle=p.a;x.beginPath();x.arc(-4,0,4,Math.PI/2,Math.PI*1.5);x.lineTo(0,-4);x.lineTo(0,4);x.fill();
-      x.fillStyle=p.b;x.beginPath();x.arc(4,0,4,-Math.PI/2,Math.PI/2);x.lineTo(0,4);x.lineTo(0,-4);x.fill();x.restore()});
-    if(++f<170)requestAnimationFrame(tick);else x.clearRect(0,0,innerWidth,innerHeight);
-  })();
+function show(id){['start','intro','clear','cakeIntro','end'].forEach(k=>$(k).hidden=k!==id)}
+$('play').onclick=async()=>{audio();tone(660,.1);tone(990,.15,'sine',.1,.1);await askTilt();lv=0;openLevel()};
+function openLevel(){
+  const L=LEVELS[lv];skyTarget=L.sky;mode='menu';$('hud').hidden=true;
+  $('iLv').textContent=`Nível ${lv+1} de 3`;$('iTt').textContent=L.title;$('iTx').textContent=L.intro;
+  $('iItems').innerHTML=`<span><b>${L.good.join('')}</b> apanhar</span><span><b>${L.bad[0]}</b> ${L.badTip}</span>`;
+  show('intro');say(`Nível ${lv+1}. ${L.title}.`);
 }
+$('go').onclick=()=>{audio();show(null);startLevel()};
+function startLevel(){
+  const L=LEVELS[lv];score=0;items=[];spawnT=0;basket.x=W/2;basket.vx=0;pointerX=null;mode='play';
+  $('hud').hidden=false;$('hLv').textContent=`Nível ${lv+1}`;$('hTt').textContent=L.title;updHud();
+}
+function updHud(){$('hSc').textContent=`${score} / ${TARGET}`;$('hBar').style.width=(score/TARGET*100)+'%'}
+function levelDone(){
+  mode='menu';$('hud').hidden=true;burst(W/2,H/2,80);tone(523,.15,'triangle',.12);tone(659,.15,'triangle',.12,.12);tone(784,.3,'triangle',.12,.24);buzz([40,40,120]);
+  setTimeout(()=>{$('kLv').textContent=`Nível ${lv+1} de 3 · ${LEVELS[lv].title}`;$('kTx').textContent=LEVELS[lv].done;show('clear')},900);
+}
+$('next').onclick=()=>{audio();lv++;if(lv<LEVELS.length)openLevel();else{skyTarget=['#0b0817','#241238'];show('cakeIntro');say('Nível final. Trinta e oito velas.')}};
+
+function spawn(){
+  const L=LEVELS[lv],bad=Math.random()<.24;
+  items.push({x:30+Math.random()*(W-60),y:-40,vy:(150+Math.random()*90)*L.speed,rot:Math.random()*6,vr:(Math.random()-.5)*3,e:bad?L.bad[0]:L.good[Math.random()*L.good.length|0],bad,s:40+Math.random()*10});
+}
+function burst(x,y,n,cols=['#ffc94a','#ff5d8f','#ffffff','#8fd3ff']){
+  for(let k=0;k<n;k++){const a=Math.random()*Math.PI*2,v=Math.random()*380+80;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,life:1,c:cols[Math.random()*cols.length|0],s:Math.random()*4+2})}
+}
+function floatText(x,y,t,c){floats.push({x,y,t,c,life:1})}
+
+// ---------- bolo ----------
+let candles=[],cake={},tapOnly=false,micAn=null,micBuf=null,lit=38,finished=false,smoke=[];
+function layoutCake(){
+  const cw=Math.min(W*.84,360),ch=cw*.5,cx=W/2,cy=H*.58;cake={cx,cy,cw,ch};
+  if(!candles.length){
+    let k=0;[[18,.86],[13,.58],[7,.28]].forEach(([n,rf],r)=>{for(let i=0;i<n;i++){candles.push({on:true,a:(i/n)*Math.PI*2+r*.4,rf,fl:Math.random()*6,c:['#ff5d8f','#8fd3ff','#ffc94a','#b98cff'][k++%4]})}});
+  }
+  const ry=ch*.18,top=cy-ch/2;
+  candles.forEach(c=>{c.x=cx+Math.cos(c.a)*cw/2*c.rf;c.y=top+Math.sin(c.a)*ry*c.rf;c.h=Math.max(22,cw*.075)});
+}
+async function startCake(useMic){
+  audio();mode='cake';finished=false;candles=[];smoke=[];lit=38;layoutCake();show(null);$('cakehud').hidden=false;updCake();
+  tapOnly=!useMic;
+  if(useMic){
+    try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const src=ac.createMediaStreamSource(st);micAn=ac.createAnalyser();micAn.fftSize=1024;src.connect(micAn);micBuf=new Float32Array(micAn.fftSize);micAn._st=st}
+    catch(e){tapOnly=true}
+  }
+  $('cHow').textContent=tapOnly?'Passa o dedo pelas velas para as apagar':'Sopra com força para o microfone do telemóvel';
+  $('micbar').hidden=tapOnly;
+}
+$('blow').onclick=()=>startCake(true);
+$('tapMode').onclick=()=>startCake(false);
+function updCake(){$('cLeft').textContent=lit===1?'Falta 1 vela':lit?`${lit} velas acesas`:'Nenhuma vela acesa'}
+function putOut(c){if(!c.on)return;c.on=false;lit--;for(let k=0;k<6;k++)smoke.push({x:c.x,y:c.y-c.h,vx:(Math.random()-.5)*20,vy:-30-Math.random()*30,life:1,r:3+Math.random()*3});tone(300+Math.random()*200,.05,'sine',.05);updCake();if(lit===0)win()}
+function tapCandles(x,y){candles.forEach(c=>{if(c.on&&Math.hypot(c.x-x,c.y-c.h-y)<34){putOut(c);buzz(10)}})}
+function micLevel(){if(!micAn)return 0;micAn.getFloatTimeDomainData(micBuf);let s=0;for(let k=0;k<micBuf.length;k++)s+=micBuf[k]*micBuf[k];return Math.sqrt(s/micBuf.length)}
+function win(){
+  if(finished)return;finished=true;buzz([100,60,100,60,400]);
+  if(micAn&&micAn._st)micAn._st.getTracks().forEach(t=>t.stop());
+  setTimeout(()=>{$('cakehud').hidden=true;mode='party';parabens();say('Parabéns, madrinha Carolina!')},900);
+  setTimeout(()=>show('end'),reduce?900:4200);
+}
+$('again').onclick=()=>{audio();show('start');mode='menu';skyTarget=['#120e2a','#2a1f5c'];candles=[]};
+
+// ---------- ciclo ----------
+let fwT=0;
+function frame(t){
+  const dt=Math.min(.033,(t-(last||t))/1000);last=t;
+  // céu
+  skyRGB=skyRGB.map((c,k)=>{const T=hex(skyTarget[k]);return c.map((v,i)=>v+(T[i]-v)*Math.min(1,dt*2))});
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,rgb(skyRGB[0]));g.addColorStop(1,rgb(skyRGB[1]));
+  ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake=Math.max(0,shake-dt*40)}
+  ctx.fillStyle=g;ctx.fillRect(-20,-20,W+40,H+40);
+  const par=(basket.x-W/2)/W;
+  stars.forEach(s=>{s.t+=dt;const a=.35+.35*Math.sin(s.t*s.z*2);ctx.fillStyle=`rgba(255,255,255,${a*s.z})`;const x=((s.x*W-par*40*s.z)%W+W)%W;ctx.beginPath();ctx.arc(x,s.y*H,s.z*1.6,0,7);ctx.fill()});
+  // bokeh suave
+  ctx.globalCompositeOperation='lighter';
+  for(let k=0;k<5;k++){const x=W*(.15+.18*k)-par*80*(k%2?1:-1),y=H*(.25+.12*Math.sin(t/3000+k));const r=ctx.createRadialGradient(x,y,0,x,y,120);r.addColorStop(0,'rgba(255,120,170,.07)');r.addColorStop(1,'rgba(255,120,170,0)');ctx.fillStyle=r;ctx.fillRect(x-120,y-120,240,240)}
+  ctx.globalCompositeOperation='source-over';
+
+  if(mode==='play')play(dt);
+  if(mode==='cake'||mode==='party')drawCake(dt,t);
+  if(mode==='party'){fwT-=dt;if(fwT<=0){fwT=.35;burst(W*(.15+Math.random()*.7),H*(.12+Math.random()*.35),60);tone(200+Math.random()*100,.2,'sine',.03)}}
+  // partículas
+  parts=parts.filter(p=>(p.life-=dt*.9)>0);
+  parts.forEach(p=>{p.vy+=500*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;ctx.globalAlpha=p.life;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.s,p.s)});ctx.globalAlpha=1;
+  floats=floats.filter(f=>(f.life-=dt*1.2)>0);
+  floats.forEach(f=>{f.y-=60*dt;ctx.globalAlpha=f.life;ctx.fillStyle=f.c;ctx.font='900 22px Unbounded, sans-serif';ctx.textAlign='center';ctx.fillText(f.t,f.x,f.y)});ctx.globalAlpha=1;
+  ctx.restore();
+  requestAnimationFrame(frame);
+}
+function play(dt){
+  // cesto
+  const by=H-Math.max(80,H*.13);
+  if(tilt!=null&&pointerX==null){basket.vx+=(tilt*55-basket.vx)*Math.min(1,dt*8)}
+  else if(keys){basket.vx=keys*520}
+  else if(pointerX!=null){basket.vx=(pointerX-basket.x)*12}
+  else basket.vx*=.9;
+  basket.x=Math.max(40,Math.min(W-40,basket.x+basket.vx*dt));
+  // gerar
+  spawnT-=dt;if(spawnT<=0){spawn();spawnT=(.75+Math.random()*.45)/LEVELS[lv].speed}
+  // objetos
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  items.forEach(it=>{it.y+=it.vy*dt;it.rot+=it.vr*dt;
+    if(!it.gone&&it.y>by-30&&it.y<by+16&&Math.abs(it.x-basket.x)<52){it.gone=true;
+      if(it.bad){score=Math.max(0,score-1);shake=14;sBad();buzz([80,40,80]);floatText(it.x,by-50,'-1','#ff8a8a');burst(it.x,by-20,14,['#7a5a3a','#a07850'])}
+      else{score++;sGood();buzz(18);floatText(it.x,by-50,'+1','#ffc94a');burst(it.x,by-20,22)}
+      updHud();if(score>=TARGET)levelDone()}
+    if(!it.gone){ctx.save();ctx.translate(it.x,it.y);ctx.rotate(Math.sin(it.rot)*.4);ctx.font=`${it.s}px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif`;
+      if(!it.bad){ctx.shadowColor='rgba(255,201,74,.6)';ctx.shadowBlur=18}ctx.fillText(it.e,0,0);ctx.restore()}
+  });
+  items=items.filter(it=>!it.gone&&it.y<H+60);
+  // desenhar cesto
+  ctx.save();ctx.translate(basket.x,by);ctx.rotate(Math.max(-.25,Math.min(.25,basket.vx/2400)));
+  const gl=ctx.createRadialGradient(0,0,0,0,0,90);gl.addColorStop(0,'rgba(255,93,143,.35)');gl.addColorStop(1,'rgba(255,93,143,0)');ctx.fillStyle=gl;ctx.fillRect(-90,-90,180,180);
+  ctx.font='64px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧺',0,0);
+  ctx.font='800 10px Unbounded, sans-serif';ctx.fillStyle='#fff7ee';ctx.fillText('MADRINHA',0,40);
+  ctx.restore();
+}
+function drawCake(dt,t){
+  const {cx,cy,cw,ch}=cake;
+  // mesa e brilho
+  const halo=ctx.createRadialGradient(cx,cy-ch*.5,0,cx,cy-ch*.5,cw*.9);halo.addColorStop(0,`rgba(255,190,90,${.08+lit/38*.32})`);halo.addColorStop(1,'rgba(255,190,90,0)');
+  ctx.fillStyle=halo;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(cx,cy+ch/2+10,cw*.62,ch*.18,0,0,7);ctx.fill();
+  // prato
+  ctx.fillStyle='#e9e4f5';ctx.beginPath();ctx.ellipse(cx,cy+ch/2,cw*.6,ch*.16,0,0,7);ctx.fill();
+  // corpo do bolo
+  const ry=ch*.18,top=cy-ch/2,bot=cy+ch/2-ch*.08;
+  const body=ctx.createLinearGradient(cx-cw/2,0,cx+cw/2,0);body.addColorStop(0,'#c2456f');body.addColorStop(.5,'#ff7aa2');body.addColorStop(1,'#b03a63');
+  ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(cx-cw/2,top);ctx.lineTo(cx-cw/2,bot);ctx.ellipse(cx,bot,cw/2,ry,0,Math.PI,0,true);ctx.lineTo(cx+cw/2,top);ctx.closePath();ctx.fill();
+  // faixa
+  ctx.fillStyle='rgba(255,255,255,.14)';ctx.fillRect(cx-cw/2,top+ch*.74,cw,ch*.05);
+  // cobertura com escorridos
+  ctx.fillStyle='#fff1f6';ctx.beginPath();ctx.ellipse(cx,top,cw/2,ry,0,0,7);ctx.fill();
+  ctx.beginPath();ctx.ellipse(cx,top,cw/2,ry,0,Math.PI,Math.PI*2,false);
+  for(let i=60;i>=0;i--){const x=cx-cw/2+cw*i/60,q=(x-cx)/(cw/2),base=top+ry*Math.sqrt(Math.max(0,1-q*q));
+    const d=ch*.035+ch*.13*Math.pow(Math.max(0,Math.sin(i*.55+.3)),4);ctx.lineTo(x,base+d)}
+  ctx.closePath();ctx.fill();
+  // texto
+  ctx.fillStyle='#fff7ee';ctx.font=`900 ${Math.round(cw*.07)}px Unbounded, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('CAROLINA 38',cx,top+ch*.56);
+  // sopro
+  let lvl=0;if(!tapOnly&&mode==='cake'){lvl=micLevel();$('micLvl').style.width=Math.min(100,lvl*600)+'%';
+    if(lvl>.06){const n=Math.floor((lvl-.05)*40*dt*20)+1;const on=candles.filter(c=>c.on);for(let k=0;k<n&&on.length;k++){putOut(on.splice(Math.random()*on.length|0,1)[0])}}}
+  // velas
+  candles.slice().sort((a,b)=>a.y-b.y).forEach(c=>{
+    const w=Math.max(5,cw*.016);ctx.fillStyle=c.c;ctx.fillRect(c.x-w/2,c.y-c.h,w,c.h);
+    ctx.fillStyle='rgba(255,255,255,.5)';for(let s=0;s<3;s++)ctx.fillRect(c.x-w/2,c.y-c.h+s*c.h/3+2,w,2);
+    ctx.fillStyle='#333';ctx.fillRect(c.x-.5,c.y-c.h-4,1,4);
+    if(c.on){c.fl+=dt*(10+Math.random()*6);const sway=Math.sin(c.fl)*1.5+(lvl*30)*(Math.random()-.3);const fh=10+Math.sin(c.fl*1.3)*2;
+      const fx=c.x+sway,fy=c.y-c.h-4;
+      const gl=ctx.createRadialGradient(fx,fy-fh/2,0,fx,fy-fh/2,22);gl.addColorStop(0,'rgba(255,200,90,.5)');gl.addColorStop(1,'rgba(255,200,90,0)');ctx.fillStyle=gl;ctx.fillRect(fx-22,fy-fh/2-22,44,44);
+      ctx.fillStyle='#ffb02e';ctx.beginPath();ctx.moveTo(fx,fy-fh);ctx.quadraticCurveTo(fx+5,fy-fh*.3,fx,fy);ctx.quadraticCurveTo(fx-5,fy-fh*.3,fx,fy-fh);ctx.fill();
+      ctx.fillStyle='#fff4c2';ctx.beginPath();ctx.ellipse(fx,fy-fh*.35,1.8,3.5,0,0,7);ctx.fill();}
+  });
+  smoke=smoke.filter(s=>(s.life-=dt*.6)>0);
+  smoke.forEach(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.r+=dt*8;ctx.fillStyle=`rgba(220,220,235,${s.life*.35})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,7);ctx.fill()});
+}
+function hex(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+function rgb(a){return `rgb(${a.map(Math.round).join(',')})`}
+
+resize();requestAnimationFrame(frame);
 </script>
 </body></html>
