@@ -21,4 +21,9 @@ As fotografias vão para a pasta `fotos/`: `1.jpg` a `7.jpg` e `bebe.jpg` (a fot
 
 Para funcionar no telemóvel, ativa o GitHub Pages: https://tiagoduarterossa-cloud.github.io/Anivers-rio-madrinha-/
 
+## Parte física (pasta `impressao/`)
+
+- `tabela-e-bilhete-A4.pdf`: o bilhete de entrada (170 × 66 mm, com QR) e duas tabelas de museu com o QR do audioguia (150 × 92 mm para a parede e 100 × 56 mm para a moldura).
+- `jornal-A4.pdf`: o Diário da Família de 22/11/1988 em papel, com o QR da edição digital. Usa `fotos/bebe.jpg` se existir.
+
 Os outros protótipos estão na pasta `prototipos/`.
