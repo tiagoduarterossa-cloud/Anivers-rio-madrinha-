@@ -1,0 +1,92 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>O Cofre da Madrinha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Rubik:wght@400;500;700&family=Share+Tech+Mono&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: o cofre em cima com os quatro dígitos; por baixo, o desafio de cada dígito */
+:root{color-scheme:dark;--bg:#101418;--steel:#5d6a74;--steel2:#2f373e;--ink:#eef3f6;--dim:#93a1ab;--lock:#ff5a4f;--open:#3fe08b;--gold:#f2c14e;--disp:"Big Shoulders Display",system-ui,sans-serif;--txt:"Rubik",system-ui,sans-serif;--mono:"Share Tech Mono",monospace}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:16px/1.5 var(--txt);padding-block:24px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font:900 clamp(38px,12vw,54px)/.9 var(--disp);margin:0;text-transform:uppercase;letter-spacing:.01em}
+.sub{margin:0;color:var(--dim)}
+.safe{position:relative;border-radius:16px;background:linear-gradient(145deg,#7a8792,#3c454d);padding:16px;box-shadow:0 20px 40px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.25);perspective:900px}
+.door{position:relative;border-radius:10px;background:linear-gradient(145deg,var(--steel),var(--steel2));padding:22px 16px;display:flex;flex-direction:column;align-items:center;gap:16px;transform-origin:0 50%;transition:transform 1.4s cubic-bezier(.4,0,.2,1);box-shadow:inset 0 0 0 3px rgba(0,0,0,.25);z-index:2}
+.safe.open .door{transform:rotateY(-105deg)}
+.wheel{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,#c9d1d7 0 22%,#4a545c 23% 30%,#8f9ba4 31% 100%);box-shadow:0 6px 14px rgba(0,0,0,.4);position:relative;transition:transform 1s}
+.wheel i{position:absolute;left:50%;top:6px;width:6px;height:98px;margin-left:-3px;background:#3a434a;border-radius:3px}
+.wheel i:nth-child(2){transform:rotate(60deg)}.wheel i:nth-child(3){transform:rotate(120deg)}
+.digits{display:flex;gap:8px}
+.digits span{width:48px;height:60px;border-radius:8px;background:#0b0e10;color:var(--lock);font:400 40px/60px var(--mono);text-align:center;box-shadow:inset 0 2px 6px rgba(0,0,0,.8)}
+.digits span.ok{color:var(--open);text-shadow:0 0 10px var(--open)}
+.led{font:400 13px var(--mono);letter-spacing:.14em;color:var(--lock)}
+.led.ok{color:var(--open)}
+.inside{position:absolute;inset:16px;border-radius:10px;background:radial-gradient(circle at 50% 40%,#3a2f12,#120f08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:16px;z-index:1}
+.inside b{font:900 30px var(--disp);color:var(--gold);text-transform:uppercase}
+.inside .gift{font-size:64px;filter:drop-shadow(0 0 20px rgba(242,193,78,.6))}
+.ch{background:#1a2026;border:1px solid #2c353d;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.ch .k{font:400 12px var(--mono);letter-spacing:.14em;color:var(--gold)}
+.ch h2{font:700 26px/1.05 var(--disp);margin:0;text-transform:uppercase}
+.ch p{margin:0}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{font:500 16px var(--txt);text-align:left;color:var(--ink);background:#232b32;border:1.5px solid #36414a;border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt.bad{border-color:var(--lock)}
+.spot{position:relative;border-radius:10px;overflow:hidden;background:linear-gradient(#7fb6d9,#cfe6f3 60%,#86b36b 60%);height:190px;cursor:crosshair}
+.spot span{position:absolute;font-size:30px;line-height:1;transform:translate(-50%,-50%)}
+.seq{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.seq button{aspect-ratio:1;border-radius:12px;border:0;font-size:30px;cursor:pointer;background:#232b32;transition:transform .1s,background .1s}
+.seq button.lit{background:var(--gold);transform:scale(1.06)}
+.btn{font:700 16px var(--txt);background:var(--gold);color:#1a1405;border:0;border-radius:999px;padding:13px 20px;cursor:pointer;align-self:flex-start}
+.fb{min-height:22px;font-weight:700;margin:0}
+.fb.good{color:var(--open)}.fb.bad{color:var(--lock)}
+.shakebar{height:14px;border-radius:7px;background:#232b32;overflow:hidden}.shakebar i{display:block;height:100%;width:0;background:var(--gold)}
+.letter{background:#f6f0e2;color:#211a10;border-radius:12px;padding:18px}
+.letter p{margin:0 0 10px;font-size:17px;line-height:1.6}
+.letter .s{font:900 24px var(--disp);color:#b3261e;text-transform:uppercase;margin:0}
+</style></head><body><div class="wrap">
+<h1>O cofre<br>da madrinha</h1>
+<p class="sub">Quatro desafios, quatro números. Só a madrinha Carolina o consegue abrir.</p>
+<div class="safe" id="safe">
+  <div class="inside"><span class="gift">🎁</span><b>Abriste!</b><span>O presente verdadeiro está à tua espera</span></div>
+  <div class="door"><div class="digits" id="digits"><span>·</span><span>·</span><span>·</span><span>·</span></div><div class="wheel" id="wheel"><i></i><i></i><i></i></div><div class="led" id="led">TRANCADO</div></div>
+</div>
+<section class="ch" id="ch"></section>
+<div class="letter" id="letter" hidden>
+  <p>Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros.</p>
+  <p>Guardaste-me sempre tanta coisa: segredos, presentes, paciência. Desta vez fui eu que te guardei uma coisa num cofre.</p>
+  <p>Parabéns, madrinha. Gosto muito de ti.</p>
+  <p class="s">O teu afilhado, Tiago</p>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const CODE=[2,2,1,1];let step=0,rot=0,ac;
+function beep(f,d=.1){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.06,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+function gotDigit(){const s=$('digits').children[step];s.textContent=CODE[step];s.classList.add('ok');rot+=140;$('wheel').style.transform=`rotate(${rot}deg)`;beep(880);setTimeout(()=>beep(1320,.15),100);buzz(40);step++;setTimeout(render,900)}
+const C=[
+ {k:'Desafio 1 de 4',t:'Encontra o afilhado',d:'Algures nesta paisagem está escondido o afilhado. Toca nele.',type:'spot'},
+ {k:'Desafio 2 de 4',t:'Pergunta de madrinha',d:'O que é que a madrinha nunca disse ao afilhado?',type:'quiz',o:['Estás tão crescido','Já comeste?','Não'],c:2},
+ {k:'Desafio 3 de 4',t:'Memória de família',d:'Vê a sequência e repete-a pela mesma ordem.',type:'seq'},
+ {k:'Desafio 4 de 4',t:'O abanão final',d:'Abana o telemóvel com força para soltar o último número. No computador, carrega no botão muitas vezes.',type:'shake'}
+];
+function render(){
+  const ch=$('ch');if(step>=4){ch.hidden=true;$('led').textContent='ABERTO';$('led').classList.add('ok');setTimeout(()=>{$('safe').classList.add('open');[523,659,784,1047].forEach((f,k)=>setTimeout(()=>beep(f,.25),k*140));buzz([100,60,300])},500);setTimeout(()=>{$('letter').hidden=false;$('letter').scrollIntoView({behavior:'smooth'})},2200);return}
+  const c=C[step];ch.innerHTML=`<div class="k">${c.k}</div><h2>${c.t}</h2><p>${c.d}</p><div id="area"></div><p class="fb" id="fb"></p>`;
+  const a=$('area');
+  if(c.type==='spot'){a.className='spot';const things=['🌳','🐄','🏠','🌻','🐑','🚜','🌳','🐓','🌷','🐄','🌳','🌻'];
+    things.forEach(t=>{const s=document.createElement('span');s.textContent=t;s.style.left=(8+Math.random()*84)+'%';s.style.top=(15+Math.random()*75)+'%';s.style.fontSize=(22+Math.random()*14)+'px';a.appendChild(s)});
+    const h=document.createElement('span');h.textContent='🧒';h.style.left=(20+Math.random()*60)+'%';h.style.top=(55+Math.random()*30)+'%';h.style.fontSize='18px';h.style.cursor='pointer';h.onclick=e=>{e.stopPropagation();$('fb').textContent='Encontrado. Estava escondido atrás de uma vaca, como sempre.';$('fb').className='fb good';gotDigit()};a.appendChild(h);
+    a.onclick=()=>{$('fb').textContent='Não é isso. Ele é pequeno e anda sempre a fugir.';$('fb').className='fb bad';beep(160,.2)}}
+  if(c.type==='quiz'){a.className='opts';c.o.forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>{if(i===c.c){$('fb').textContent='Exato. Nunca disseste. Nem uma vez.';$('fb').className='fb good';gotDigit()}else{b.classList.add('bad');$('fb').textContent='Hmm, essa diz muitas vezes.';$('fb').className='fb bad';beep(160,.2);buzz(60)}};a.appendChild(b)})}
+  if(c.type==='seq'){a.className='seq';const em=['🎂','🎁','🎈','💖'];const btns=em.map(e=>{const b=document.createElement('button');b.textContent=e;a.appendChild(b);return b});
+    const pat=[0,2,1,3,1];let i=0,ready=false;const go=$('fb');go.textContent='Atenção...';
+    pat.forEach((p,k)=>setTimeout(()=>{btns[p].classList.add('lit');beep(400+p*150,.2);setTimeout(()=>btns[p].classList.remove('lit'),350);if(k===pat.length-1)setTimeout(()=>{ready=true;go.textContent='A tua vez.'},500)},700+k*600));
+    btns.forEach((b,p)=>b.onclick=()=>{if(!ready)return;b.classList.add('lit');setTimeout(()=>b.classList.remove('lit'),200);beep(400+p*150,.15);
+      if(p===pat[i]){i++;if(i===pat.length){ready=false;go.textContent='Memória de madrinha, impecável.';go.className='fb good';gotDigit()}}else{i=0;go.textContent='Falhaste. Recomeça do princípio, a sequência é a mesma.';go.className='fb bad';buzz(80)}})}
+  if(c.type==='shake'){a.innerHTML='<div class="shakebar"><i id="sb"></i></div><button class="btn" id="tap" type="button" style="margin-top:10px">Abanar</button>';let p=0;
+    const add=v=>{p=Math.min(100,p+v);$('sb').style.width=p+'%';if(p>=100&&step===3){window.removeEventListener('devicemotion',dm);$('fb').textContent='Solto! Isto foi força de madrinha.';$('fb').className='fb good';gotDigit()}};
+    const dm=e=>{const g=e.accelerationIncludingGravity||e.acceleration;if(!g)return;const m=Math.abs(g.x||0)+Math.abs(g.y||0)+Math.abs(g.z||0);if(m>30){add(4);buzz(10)}};
+    $('tap').onclick=async()=>{try{if(typeof DeviceMotionEvent!=='undefined'&&DeviceMotionEvent.requestPermission)await DeviceMotionEvent.requestPermission()}catch(e){}window.addEventListener('devicemotion',dm);add(9);beep(200+p*4,.05)}}
+}
+render();
+</script></body></html>

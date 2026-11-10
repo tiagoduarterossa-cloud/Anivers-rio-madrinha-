@@ -1,0 +1,78 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Avaliação de desempenho da madrinha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=IBM+Plex+Serif:ital,wght@0,600;1,400&family=Caveat:wght@600&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: um formulário oficial de recursos humanos, uma folha A4 que se lê de cima a baixo */
+:root{color-scheme:light;--desk:#d9dde2;--paper:#fff;--ink:#1f2933;--muted:#5f6b77;--line:#cdd3da;--blue:#1d4ed8;--stamp:#c0262d;--sans:"IBM Plex Sans",system-ui,sans-serif;--serif:"IBM Plex Serif",Georgia,serif;--hand:"Caveat",cursive}
+body{margin:0;background:var(--desk);color:var(--ink);font:15px/1.5 var(--sans);padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{max-width:640px;margin:0 auto;background:var(--paper);padding:22px 20px 28px;box-shadow:0 14px 40px rgba(0,0,0,.18);position:relative;overflow:hidden}
+.hd{display:flex;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px;flex-wrap:wrap}
+.hd .org{font:700 12px var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.hd .ref{font:400 12px ui-monospace,monospace;color:var(--muted)}
+h1{font:600 26px/1.15 var(--serif);margin:14px 0 4px}
+.sub{color:var(--muted);margin:0 0 14px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0 0 16px;font-size:14px}
+dt{color:var(--muted)}dd{margin:0;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font:700 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--ink);padding:6px 4px}
+td{border-bottom:1px solid var(--line);padding:10px 4px;vertical-align:top}
+td.s{white-space:nowrap;text-align:right}
+.stars{display:inline-flex;gap:2px}
+.stars i{width:16px;height:16px;background:var(--line);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);transition:background .2s}
+.stars i.on{background:#f59e0b}
+.c{display:block;font-size:13px;color:var(--muted);margin-top:2px;font-style:italic}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px;font-weight:700}
+.total b{font:600 32px var(--serif);color:var(--blue)}
+h2{font:700 12px var(--sans);letter-spacing:.1em;text-transform:uppercase;margin:22px 0 6px;color:var(--muted)}
+.obs{font:italic 400 16px/1.6 var(--serif);margin:0}
+.sign{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
+.sign div{font-size:12px;color:var(--muted)}
+.sig{height:90px;border-bottom:1px solid var(--ink);position:relative;touch-action:none;background:repeating-linear-gradient(90deg,transparent 0 6px,rgba(0,0,0,.03) 6px 7px)}
+.sig canvas{position:absolute;inset:0;width:100%;height:100%}
+.afi{font-family:"Caveat",cursive;font-weight:600;font-size:40px;line-height:90px;color:var(--blue);height:90px;border-bottom:1px solid var(--ink);padding-left:6px}
+.btn{font:600 15px var(--sans);background:var(--blue);color:#fff;border:0;border-radius:6px;padding:12px 16px;cursor:pointer;margin-top:14px}
+.stamp{position:absolute;right:14px;top:40%;transform:rotate(-14deg) scale(2);opacity:0;border:4px solid var(--stamp);color:var(--stamp);font:700 22px/1.1 var(--sans);letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;text-align:center;transition:all .35s cubic-bezier(.2,1.6,.4,1);pointer-events:none;background:rgba(255,255,255,.6)}
+.stamp.on{opacity:.9;transform:rotate(-14deg) scale(1)}
+@media (max-width:480px){.sign{grid-template-columns:minmax(0,1fr)}}
+</style></head><body>
+<article class="sheet">
+  <div class="hd"><span class="org">Departamento de Afilhados · Recursos Humanos</span><span class="ref">Ref. AV-1988-2026</span></div>
+  <h1>Avaliação anual de desempenho</h1>
+  <p class="sub">Função: madrinha. Período avaliado: 2010 a 2026.</p>
+  <dl><dt>Avaliada</dt><dd>Carolina Breda</dd><dt>Antiguidade</dt><dd>16 anos de serviço, 38 de idade</dd><dt>Avaliador</dt><dd>O afilhado</dd><dt>Faltas</dt><dd>0</dd></dl>
+  <table><thead><tr><th>Competência</th><th style="text-align:right">Classificação</th></tr></thead><tbody id="rows"></tbody></table>
+  <div class="total"><span>Classificação final</span><b id="final">0,0</b></div>
+  <h2>Observações do avaliador</h2>
+  <p class="obs">Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros. Não há nesta empresa ninguém com uma avaliação assim. Recomendo a renovação do contrato por tempo indeterminado. Parabéns, madrinha. Gosto muito de ti.</p>
+  <h2>Assinaturas</h2>
+  <div class="sign">
+    <div><div class="afi">Tiago</div>O avaliador</div>
+    <div><div class="sig" id="sig"><canvas id="cv"></canvas></div>A avaliada, assina aqui com o dedo</div>
+  </div>
+  <button class="btn" id="ok" type="button">Assinar e renovar contrato</button>
+  <div class="stamp" id="stamp">Contrato renovado<br><small style="font-size:12px">por toda a vida</small></div>
+</article>
+<script>
+const $=id=>document.getElementById(id);
+const R=[
+ ['Assiduidade','Presente em todos os anos, Natais e festas. Zero faltas injustificadas.',5],
+ ['Gestão de presentes','Nunca falhou um aniversário. Ultrapassa o orçamento com frequência.',5],
+ ['Paciência','Aturou um afilhado bebé, criança e adolescente. Em simultâneo, às vezes.',5],
+ ['Comunicação','Diz "estás tão crescido" em todas as reuniões. Mensagem clara e consistente.',5],
+ ['Capacidade de dizer não ao afilhado','Não demonstrada em 16 anos. Ponto a melhorar, mas ninguém quer que melhore.',1],
+ ['Abraços','Acima do esperado para a função.',5]
+];
+const rows=$('rows');R.forEach(([n,c,s])=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${n}<span class="c">${c}</span></td><td class="s"><span class="stars" data-s="${s}">${'<i></i>'.repeat(5)}</span></td>`;rows.appendChild(tr)});
+let k=0;const all=[...document.querySelectorAll('.stars')];
+const t=setInterval(()=>{const st=all[Math.floor(k/5)];if(!st){clearInterval(t);$('final').textContent='4,9 / 5';return}const i=k%5;if(i<+st.dataset.s)st.children[i].classList.add('on');k++},90);
+// assinatura com o dedo
+const cv=$('cv'),x=cv.getContext('2d');let dr=false,signed=false;
+function sz(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;x.setTransform(d,0,0,d,0,0);x.lineWidth=2.4;x.lineCap='round';x.strokeStyle='#1d4ed8'}
+sz();addEventListener('resize',sz);
+const p=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+cv.addEventListener('pointerdown',e=>{dr=true;cv.setPointerCapture(e.pointerId);x.beginPath();x.moveTo(...p(e))});
+cv.addEventListener('pointermove',e=>{if(!dr)return;x.lineTo(...p(e));x.stroke();signed=true});
+cv.addEventListener('pointerup',()=>dr=false);
+$('ok').onclick=()=>{if(!signed){$('ok').textContent='Falta a tua assinatura';return}$('stamp').classList.add('on');try{navigator.vibrate&&navigator.vibrate(60);const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=70;g.gain.setValueAtTime(.5,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.3)}catch(e){}$('ok').textContent='Contrato renovado';$('ok').disabled=true};
+</script></body></html>

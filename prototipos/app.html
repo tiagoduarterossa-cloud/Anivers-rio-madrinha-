@@ -1,0 +1,81 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Um ano de madrinha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: app de uma coluna; contagem para os 39 em cima, doze vales em grelha, um por mês */
+:root{color-scheme:light;--bg:#f4f1fb;--card:#fff;--ink:#1d1838;--muted:#6c6690;--acc:#6d4aff;--acc2:#ff6fa5;--lock:#d9d4ec;--f:"Sora",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15122a;--card:#211c3d;--ink:#f1eefe;--muted:#a7a0cf;--lock:#2f2952;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15122a;--card:#211c3d;--ink:#f1eefe;--muted:#a7a0cf;--lock:#2f2952;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f);padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.hello{font-size:14px;color:var(--muted);margin:0}
+h1{font:800 32px/1.05 var(--f);margin:0}
+.count{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px}
+.count small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.count .n{display:flex;gap:14px}
+.count .n div{font:800 34px/1 var(--f);font-variant-numeric:tabular-nums}
+.count .n span{display:block;font:600 11px var(--f);opacity:.85;margin-top:4px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.v{aspect-ratio:1;border:0;border-radius:18px;background:var(--card);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;box-shadow:0 4px 14px rgba(40,20,120,.08);font:600 13px var(--f);padding:6px}
+.v b{font-size:28px;line-height:1}
+.v.lock{background:var(--lock);color:var(--muted);cursor:default;box-shadow:none}
+.v.now{outline:3px solid var(--acc2);outline-offset:2px}
+.v.used{opacity:.55}
+.sheet{position:fixed;inset:0;background:rgba(10,6,30,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px));z-index:5}
+.ticket{width:100%;max-width:440px;background:var(--card);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:10px;animation:up .3s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+.ticket .m{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc2);font-weight:600}
+.ticket h2{font:800 26px/1.1 var(--f);margin:0}
+.ticket p{margin:0;color:var(--muted)}
+.ticket .code{font:600 14px ui-monospace,monospace;background:var(--bg);border-radius:10px;padding:10px;text-align:center;letter-spacing:.14em}
+.btn{font:600 15px var(--f);background:var(--acc);color:#fff;border:0;border-radius:999px;padding:13px 18px;cursor:pointer}
+.btn.g{background:transparent;color:var(--ink);border:1.5px solid var(--lock)}
+.demo{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.msg{background:var(--card);border-radius:18px;padding:16px;font-size:15px}
+.msg b{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:4px}
+</style></head><body><div class="wrap">
+<p class="hello">Olá, madrinha Carolina</p>
+<h1>Um ano de madrinha</h1>
+<div class="count"><small>Até aos 39 anos</small><div class="n" id="cd"></div></div>
+<div class="msg" id="msg"><b>Mensagem de hoje</b><span id="today"></span></div>
+<div class="grid" id="grid"></div>
+<div class="demo"><span>Cada vale abre no dia 22 do seu mês.</span><button class="btn g" id="demo" type="button">Modo demonstração: abrir todos</button></div>
+</div>
+<div class="sheet" id="sheet" hidden><div class="ticket">
+  <div class="m" id="tM"></div><h2 id="tT"></h2><p id="tD"></p><div class="code" id="tC"></div>
+  <button class="btn" id="use" type="button">Usar este vale</button><button class="btn g" id="close" type="button">Fechar</button>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const M=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+// Um vale por mês, de novembro de 2026 a outubro de 2027
+const V=[
+ {m:10,y:2026,e:'🎂',t:'Um dia sem fazer nada',d:'Hoje é dia de anos. Este vale dá direito a não lavar loiça, não responder a emails e não ter razão em nenhuma discussão. Na verdade tens sempre.'},
+ {m:11,y:2026,e:'🎄',t:'Um embrulho feito por mim',d:'Este Natal sou eu que embrulho um dos teus presentes. Resultado estético não garantido.'},
+ {m:0,y:2027,e:'☕',t:'Um café a dois',d:'Um café só nós os dois, sem telemóveis. Pago eu, com a mesada.'},
+ {m:1,y:2027,e:'🍫',t:'Chocolate de emergência',d:'Válido em qualquer dia mau de fevereiro. Entrega ao domicílio pelo afilhado.'},
+ {m:2,y:2027,e:'📸',t:'Uma selfie oficial',d:'Uma fotografia nossa, tirada como deve ser, sem ninguém de olhos fechados.'},
+ {m:3,y:2027,e:'🎬',t:'Um filme à tua escolha',d:'Vemos o filme que quiseres. Até aqueles que eu acho aborrecidos. Sem me queixar.'},
+ {m:4,y:2027,e:'🍰',t:'Um bolo feito por mim',d:'Um bolo feito por mim, do princípio ao fim. A cozinha fica limpa. Mais ou menos.'},
+ {m:5,y:2027,e:'🌊',t:'Um passeio na Costa Nova',d:'Uma tarde na praia, com gelado. Eu levo a toalha.'},
+ {m:6,y:2027,e:'🎒',t:'Um dia de afilhado às ordens',d:'Durante um dia, faço o que precisares. Recados, mudanças, montar móveis. Dentro do razoável.'},
+ {m:7,y:2027,e:'📞',t:'Uma chamada surpresa',d:'Ligo-te sem motivo nenhum, só para saber como estás. Prometido.'},
+ {m:8,y:2027,e:'✉️',t:'Uma carta escrita à mão',d:'Uma carta em papel, com a minha letra feia. Para guardares.'},
+ {m:9,y:2027,e:'🤗',t:'Abraço com prazo alargado',d:'Um abraço sem limite de tempo. Último vale antes dos 39. Parabéns adiantados.'}
+];
+let demo=false,used=new Set();try{used=new Set(JSON.parse(localStorage.getItem('vales')||'[]'))}catch(e){}
+function open(i){const now=new Date(),v=V[i],d=new Date(v.y,v.m,22);return demo||now>=d}
+function draw(){const g=$('grid');g.innerHTML='';const now=new Date();
+  V.forEach((v,i)=>{const b=document.createElement('button');b.type='button';const o=open(i),isNow=now.getFullYear()===v.y&&now.getMonth()===v.m;
+    b.className='v'+(o?'':' lock')+(isNow?' now':'')+(used.has(i)?' used':'');b.innerHTML=`<b>${o?v.e:'🔒'}</b>${M[v.m]}`;
+    b.onclick=()=>{if(!o)return;$('tM').textContent=`Vale de ${M[v.m]} ${v.y}`;$('tT').textContent=v.t;$('tD').textContent=v.d;$('tC').textContent=`VALE-${String(i+1).padStart(2,'0')}-CAROLINA`;$('use').textContent=used.has(i)?'Já usado':'Usar este vale';$('use').disabled=used.has(i);$('use').onclick=()=>{used.add(i);try{localStorage.setItem('vales',JSON.stringify([...used]))}catch(e){}$('sheet').hidden=true;draw()};$('sheet').hidden=false};
+    g.appendChild(b)})}
+function tick(){const t=new Date(2027,10,22)-new Date(),d=Math.max(0,Math.floor(t/864e5)),h=Math.max(0,Math.floor(t/36e5)%24),m=Math.max(0,Math.floor(t/6e4)%60),s=Math.max(0,Math.floor(t/1e3)%60);
+  $('cd').innerHTML=`<div>${d}<span>dias</span></div><div>${h}<span>horas</span></div><div>${m}<span>min</span></div><div>${s}<span>seg</span></div>`}
+const MSGS=['Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros. Parabéns. Gosto muito de ti. Tiago','Hoje é um bom dia para usar um vale.','Lembrete do afilhado: estás proibida de ficar mais velha. Só mais sábia.'];
+$('today').textContent=MSGS[new Date().getDate()===22?0:new Date().getDate()%2+1];
+$('demo').onclick=()=>{demo=!demo;$('demo').textContent=demo?'Sair da demonstração':'Modo demonstração: abrir todos';draw()};
+$('close').onclick=()=>$('sheet').hidden=true;
+draw();tick();setInterval(tick,1000);
+</script></body></html>

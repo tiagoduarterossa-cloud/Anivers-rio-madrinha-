@@ -1,0 +1,78 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Museu da Madrinha</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: um corredor de museu em 3D, as obras nas paredes; a ficha da obra abre por baixo */
+:root{color-scheme:dark;--wall:#e9e4da;--floor:#6b5843;--ink:#1d1a16;--gold:#b8914a;--night:#141210;--serif:"Cormorant Garamond",Georgia,serif;--sans:"Work Sans",system-ui,sans-serif}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--night);color:#f4efe6;font:16px/1.5 var(--sans)}
+.top{position:fixed;top:0;left:0;right:0;z-index:5;padding:calc(env(safe-area-inset-top,0px) + 14px) max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;justify-content:space-between;align-items:baseline;gap:10px;background:linear-gradient(var(--night),transparent)}
+.top h1{font:600 24px/1 var(--serif);margin:0;letter-spacing:.02em}
+.top span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#bfb6a6}
+.scene{position:fixed;inset:0;perspective:700px;perspective-origin:50% 45%}
+.hall{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.3,.7,.2,1)}
+.wall{position:absolute;width:3000px;height:420px;top:-230px;background:var(--wall);background-image:linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:120px 100%;transform-style:preserve-3d}
+.wall.l{left:-180px;transform:rotateY(90deg);transform-origin:0 50%}
+.wall.r{left:180px;transform:rotateY(-90deg) translateX(-3000px);transform-origin:0 50%}
+.floor{position:absolute;left:-180px;top:190px;width:360px;height:3000px;transform:rotateX(90deg);transform-origin:50% 0;background:repeating-linear-gradient(0deg,#5e4c39 0 60px,#6f5a44 60px 62px),var(--floor)}
+.ceil{position:absolute;left:-180px;top:-230px;width:360px;height:3000px;transform:rotateX(-90deg);transform-origin:50% 0;background:#d8d2c6;background-image:radial-gradient(circle at 50% 50%,rgba(255,240,200,.8) 0 6px,transparent 7px);background-size:360px 300px}
+.end{position:absolute;left:-180px;top:-230px;width:360px;height:420px;transform:translateZ(-3000px);background:#cfc6b6;display:flex;align-items:center;justify-content:center}
+.art{position:absolute;top:70px;width:200px;height:150px;background:#2b2620;border:12px solid var(--gold);box-shadow:0 8px 20px rgba(0,0,0,.35),inset 0 0 0 4px #e9e0c8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:56px;padding:0}
+.art::after{content:attr(data-n);position:absolute;bottom:-46px;left:50%;transform:translateX(-50%);background:#fbf8f1;color:var(--ink);font:600 11px var(--sans);padding:4px 8px;white-space:nowrap;letter-spacing:.04em}
+.end .art{position:relative;top:0;width:220px;height:170px;font-size:70px}
+.hud{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 16px) max(16px,env(safe-area-inset-left,0px));display:flex;gap:10px;justify-content:center;background:linear-gradient(transparent,var(--night))}
+.hud button,.card button{font:600 15px var(--sans);background:#f4efe6;color:var(--ink);border:0;border-radius:999px;padding:13px 20px;cursor:pointer}
+.hud button.g{background:transparent;color:#f4efe6;border:1px solid rgba(244,239,230,.5)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;padding:0 max(12px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 12px) max(12px,env(safe-area-inset-left,0px))}
+.card{width:100%;max-width:460px;background:#fbf8f1;color:var(--ink);border-radius:6px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 -10px 40px rgba(0,0,0,.5);max-height:70vh;overflow:auto;animation:up .35s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.card .n{font:600 11px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#8a7a5e}
+.card h2{font:600 30px/1.05 var(--serif);margin:0}
+.card .tech{font:italic 500 18px/1.3 var(--serif);color:#5b5246;margin:0}
+.card p{margin:0;font-size:16px}
+.card .row{display:flex;gap:8px;flex-wrap:wrap}
+.card .row button:last-child{background:transparent;border:1px solid #c9bfae}
+.note{font:500 18px/1.6 var(--serif)!important}
+.hint{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:4;font-size:13px;color:#d9d0bf;text-align:center;width:80%;pointer-events:none}
+</style></head><body>
+<div class="top"><h1>Museu da Madrinha</h1><span>Coleção permanente</span></div>
+<div class="scene" id="scene"><div class="hall" id="hall">
+  <div class="floor"></div><div class="ceil"></div>
+  <div class="wall l" id="wl"></div><div class="wall r" id="wr"></div>
+  <div class="end"><button class="art" data-k="5" data-n="Obra 6 · A nota do curador">💌</button></div>
+</div></div>
+<p class="hint" id="hint">Inclina o telemóvel ou arrasta para olhar. Toca numa obra.</p>
+<div class="hud"><button class="g" id="back" type="button">Recuar</button><button id="fwd" type="button">Avançar na sala</button></div>
+<div class="sheet" id="sheet" hidden><div class="card">
+  <div class="n" id="cN"></div><h2 id="cT"></h2><p class="tech" id="cTech"></p><p id="cTx"></p>
+  <div class="row"><button id="listen" type="button">Ouvir o audioguia</button><button id="close" type="button">Fechar</button></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+// As obras. As fotos verdadeiras entram no lugar dos emojis.
+const OBRAS=[
+ {e:'👶',t:'O batizado',y:'2010',tech:'Água benta sobre bebé, com madrinha em pânico controlado',tx:'Repare na firmeza com que a madrinha segura a obra principal, que chora. Os críticos consideram esta peça a fundação de todo o período posterior. Não foi devolvida.',side:'l',z:500},
+ {e:'🎂',t:'Primeiro aniversário',y:'2011',tech:'Bolo sobre cara, técnica de impacto',tx:'Uma obra de transição. O artista, então com um ano, explora pela primeira vez a relação entre o bolo e a madrinha. A madrinha ainda hoje encontra glacé na roupa.',side:'r',z:900},
+ {e:'🎁',t:'Natal, período dourado',y:'2015',tech:'Papel de embrulho, fita-cola e paciência',tx:'Esta série é célebre pela regularidade. Durante anos seguidos, a madrinha produziu presentes com precisão de relojoeiro. Os especialistas nunca encontraram um ano em falta.',side:'l',z:1300},
+ {e:'🍕',t:'Adolescente com fome',y:'2023',tech:'Frigorífico aberto, luz natural',tx:'Peça do período tardio. O afilhado, já maior do que a madrinha, mantém a pose clássica de quem pergunta "o que há para comer". A madrinha responde com a generosidade de sempre.',side:'r',z:1700},
+ {e:'📸',t:'Selfie de família',y:'2025',tech:'Telemóvel em braço esticado, alguém de olhos fechados',tx:'Obra coletiva. Note-se que há sempre uma pessoa a piscar os olhos. A curadoria decidiu que isso faz parte da autenticidade da peça.',side:'l',z:2100},
+ {e:'💌',t:'Nota do curador',y:'2026',tech:'Palavras escritas pelo afilhado',tx:'Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros. Este museu é pequeno, mas tudo o que está cá dentro é verdade. Parabéns, madrinha. Gosto muito de ti. O teu afilhado, Tiago.',final:true}
+];
+OBRAS.forEach((o,k)=>{if(o.final)return;const b=document.createElement('button');b.className='art';b.textContent=o.e;b.dataset.k=k;b.dataset.n=`Obra ${k+1} · ${o.t}`;
+  b.style.left=(o.side==='l'?o.z:3000-o.z-200)+'px';$(o.side==='l'?'wl':'wr').appendChild(b)});
+let z=0,yaw=0,pitch=0,drag=null;
+function render(){$('hall').style.transform=`translateZ(${z}px) rotateX(${pitch}deg) rotateY(${yaw}deg)`}
+$('fwd').onclick=()=>{z=Math.min(2550,z+420);render();step()};$('back').onclick=()=>{z=Math.max(0,z-420);render();step()};
+addEventListener('deviceorientation',e=>{if(e.gamma==null)return;yaw=Math.max(-40,Math.min(40,e.gamma*1.2));pitch=Math.max(-10,Math.min(10,(e.beta-60)*.2));$('hall').style.transition='transform .2s';render()});
+$('scene').addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,yaw,pitch}});
+addEventListener('pointermove',e=>{if(!drag)return;yaw=Math.max(-50,Math.min(50,drag.yaw+(e.clientX-drag.x)*.15));pitch=Math.max(-10,Math.min(10,drag.pitch-(e.clientY-drag.y)*.05));$('hall').style.transition='none';render()});
+addEventListener('pointerup',()=>{drag=null;$('hall').style.transition='transform .9s cubic-bezier(.3,.7,.2,1)'});
+document.addEventListener('click',e=>{const a=e.target.closest('.art');if(a)open(+a.dataset.k)});
+let ac=null;function step(){try{ac=ac||new AudioContext();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=90;g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.15);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.16)}catch(e){}}
+let cur=0;
+function open(k){cur=k;const o=OBRAS[k];$('cN').textContent=o.final?'Última sala':`Obra ${k+1} · ${o.y}`;$('cT').textContent=o.t;$('cTech').textContent=o.tech;$('cTx').textContent=o.tx;$('cTx').classList.toggle('note',!!o.final);$('sheet').hidden=false;$('hint').hidden=true}
+$('close').onclick=()=>{$('sheet').hidden=true;try{speechSynthesis.cancel()}catch(e){}};
+$('listen').onclick=()=>{try{const s=speechSynthesis,o=OBRAS[cur];s.cancel();const u=new SpeechSynthesisUtterance(`${o.t}. ${o.tech}. ${o.tx}`);u.lang='pt-PT';u.rate=.92;u.pitch=.85;const v=s.getVoices().find(x=>/pt[-_]PT/i.test(x.lang));if(v)u.voice=v;s.speak(u)}catch(e){}};
+render();
+</script></body></html>

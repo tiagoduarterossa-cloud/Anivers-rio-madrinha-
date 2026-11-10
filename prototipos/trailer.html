@@ -1,0 +1,66 @@
+<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Carolina, o filme</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@300;500&display=swap">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+/* Layout: ecrã de cinema a preto, com barras em cima e em baixo; cartões de texto em sequência */
+:root{color-scheme:dark;--ink:#f5efe4;--gold:#e9b44c;--dim:#9a9389;--title:"Anton",Impact,sans-serif;--txt:"Oswald",system-ui,sans-serif}
+html,body{height:100%;margin:0;overflow:hidden;background:#000;color:var(--ink);font:16px/1.4 var(--txt)}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 max(24px,env(safe-area-inset-right,0px)) 0 max(24px,env(safe-area-inset-left,0px))}
+.bar{position:fixed;left:0;right:0;height:12vh;background:#000;z-index:3}.bar.t{top:0}.bar.b{bottom:0}
+canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+.card{position:relative;z-index:2;max-width:560px;opacity:0;transform:scale(1.08);transition:opacity .9s,transform 4s ease-out}
+.card.on{opacity:1;transform:scale(1)}
+.card .s{font:300 clamp(18px,5vw,26px)/1.35 var(--txt);letter-spacing:.06em;text-transform:uppercase}
+.card .big{font:400 clamp(54px,18vw,110px)/.9 var(--title);letter-spacing:.02em;text-transform:uppercase}
+.card .big em{font-style:normal;color:var(--gold)}
+.card .q{font:300 clamp(18px,5vw,24px)/1.4 var(--txt);font-style:italic;color:var(--dim)}
+.credits{font:300 14px/2 var(--txt);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.credits b{color:var(--ink);font-weight:500}
+.start{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#000;text-align:center;padding:24px}
+.start .rate{border:2px solid var(--gold);color:var(--gold);padding:10px 14px;font:500 13px/1.4 var(--txt);letter-spacing:.06em;text-transform:uppercase;max-width:320px}
+.start button,.again{font:500 18px var(--txt);letter-spacing:.14em;text-transform:uppercase;background:var(--ink);color:#000;border:0;padding:14px 26px;cursor:pointer}
+.again{position:fixed;bottom:calc(12vh + 16px);left:50%;transform:translateX(-50%);z-index:4}
+</style></head><body>
+<canvas id="fx"></canvas><div class="bar t"></div><div class="bar b"></div>
+<div class="screen" id="screen"></div>
+<div class="start" id="start"><div class="rate">Este trailer foi aprovado para todas as madrinhas. Contém cenas de ternura intensa.</div><button id="go" type="button">Ver o trailer</button><span style="color:var(--dim);font-size:13px">Liga o som</span></div>
+<button class="again" id="again" type="button" hidden>Ver outra vez</button>
+<script>
+const $=id=>document.getElementById(id);
+const SCENES=[
+ {h:'<div class="s">Num mundo onde os afilhados não param de crescer...</div>',v:'Num mundo onde os afilhados não param de crescer.',d:3800,hit:1},
+ {h:'<div class="s">... uma mulher aceitou uma missão</div>',v:'Uma mulher aceitou uma missão.',d:3200,hit:1},
+ {h:'<div class="big">2010</div><div class="s">O batizado</div>',v:'Dois mil e dez. O batizado.',d:3000,hit:2},
+ {h:'<div class="q">"Segura-o tu, que eu tenho medo de o deixar cair."</div>',v:'',d:3200},
+ {h:'<div class="s">Anos. Natais. Tardes de domingo.</div>',v:'Anos. Natais. Tardes de domingo.',d:3400,hit:1},
+ {h:'<div class="s">Ela nunca falhou um</div>',v:'Ela nunca falhou um.',d:2800,hit:2},
+ {h:'<div class="q">"Estás tão crescido!"</div><div class="s" style="margin-top:10px;color:var(--dim)">Ela, em todos os encontros desde 2010</div>',v:'',d:3600},
+ {h:'<div class="s">Este inverno</div>',v:'Este inverno.',d:2200,hit:1},
+ {h:'<div class="s">a lenda faz</div>',v:'A lenda faz',d:1500},
+ {h:'<div class="big"><em>38</em></div>',v:'trinta e oito.',d:2600,hit:3},
+ {h:'<div class="big">Carolina</div><div class="s">O filme</div>',v:'Carolina. O filme.',d:4200,hit:3},
+ {h:'<div class="credits">Realização <b>o afilhado</b><br>Argumento <b>o afilhado</b><br>Produção <b>o afilhado, sem orçamento</b><br>No papel principal <b>Carolina Breda</b><br><br>Brevemente, em todas as casas da família</div>',v:'',d:5200},
+ {h:'<div class="q" style="color:var(--ink)">Os meus pais escolheram-te para madrinha num só dia. Tu escolheste continuar a sê-lo em todos os outros.<br><br>Parabéns, madrinha. Gosto muito de ti.</div><div class="s" style="margin-top:14px;color:var(--gold)">O teu afilhado, Tiago</div>',v:'Parabéns, madrinha. Gosto muito de ti.',d:9000,end:1}
+];
+let ac;
+function boom(level){if(!ac)return;const t=ac.currentTime;
+  const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(30,t+1.4);g.gain.setValueAtTime(.5*level/3+.15,t);g.gain.exponentialRampToValueAtTime(.001,t+1.6);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+1.7);
+  const n=ac.sampleRate*1.2|0,b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let k=0;k<n;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/n,2);
+  const s=ac.createBufferSource(),f=ac.createBiquadFilter(),gg=ac.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=600;gg.gain.value=.25;s.connect(f).connect(gg).connect(ac.destination);s.start(t)}
+function drone(){if(!ac)return;[55,82.4,110].forEach(fr=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sawtooth';o.frequency.value=fr;const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=380;g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(.035,ac.currentTime+4);g.gain.setValueAtTime(.035,ac.currentTime+40);g.gain.linearRampToValueAtTime(0,ac.currentTime+50);o.connect(f).connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+51)})}
+function say(t){if(!t)return;try{const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';u.rate=.85;u.pitch=.6;const v=speechSynthesis.getVoices().find(x=>/pt[-_]PT/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+// poeira de projetor
+const cv=$('fx'),x=cv.getContext('2d');let dust=Array.from({length:60},()=>({x:Math.random(),y:Math.random(),v:Math.random()*.0006+.0002,s:Math.random()*1.5+.3}));
+function fx(){cv.width=innerWidth;cv.height=innerHeight;const g=x.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width*.8);g.addColorStop(0,'#141210');g.addColorStop(1,'#000');x.fillStyle=g;x.fillRect(0,0,cv.width,cv.height);
+  dust.forEach(d=>{d.y-=d.v;if(d.y<0)d.y=1;x.fillStyle='rgba(255,240,210,.25)';x.fillRect(d.x*cv.width,d.y*cv.height,d.s,d.s)});requestAnimationFrame(fx)}
+fx();
+async function run(){
+  $('start').hidden=true;$('again').hidden=true;try{ac=ac||new AudioContext();await ac.resume()}catch(e){}drone();
+  for(const s of SCENES){const c=document.createElement('div');c.className='card';c.innerHTML=s.h;$('screen').innerHTML='';$('screen').appendChild(c);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.add('on')));if(s.hit)boom(s.hit);say(s.v);
+    await new Promise(r=>setTimeout(r,s.d));if(!s.end){c.classList.remove('on');await new Promise(r=>setTimeout(r,700))}}
+  $('again').hidden=false;
+}
+$('go').onclick=run;$('again').onclick=run;
+</script></body></html>
