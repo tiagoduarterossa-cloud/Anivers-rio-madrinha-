@@ -1,2 +1,3 @@
-Põe aqui as fotografias com os nomes 1.jpg, 2.jpg, 3.jpg, 4.jpg, 5.jpg e 6.jpg.
-As legendas e as perguntas estão na lista PERGUNTAS em index.html.
+Põe aqui as fotografias:
+1.jpg a 7.jpg para as obras do museu (a 7 é a obra principal, na última sala)
+bebe.jpg para a fotografia da primeira página do jornal
