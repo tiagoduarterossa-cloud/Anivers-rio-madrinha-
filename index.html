@@ -25,6 +25,7 @@ body{background:var(--night);color:var(--ink);font:16px/1.5 var(--body);-webkit-
 .hud .lv{font:700 11px var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
 .hud .tt{font:900 18px var(--display)}
 .hud .sc{font:800 16px var(--body);font-variant-numeric:tabular-nums}
+.mute{pointer-events:auto;font:700 11px var(--body);letter-spacing:.04em;color:var(--dim);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:4px 10px;margin-top:4px;cursor:pointer}
 .meter{height:10px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
 .meter i{display:block;height:100%;width:0;border-radius:5px;background:linear-gradient(90deg,var(--gold),var(--pink));box-shadow:0 0 12px var(--pink);transition:width .25s}
 .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;
@@ -53,6 +54,30 @@ h2{font-size:clamp(28px,8.5vw,36px)}
 .mic{width:100%;max-width:300px;height:8px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
 .mic i{display:block;height:100%;width:0;background:var(--gold)}
 .letter p{font-size:17px}
+.blister{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px;border-radius:16px;background:linear-gradient(135deg,#e6e9ee,#c9cfd7 40%,#eef1f4 60%,#c3c9d2);box-shadow:inset 0 1px 0 #fff,0 10px 24px rgba(0,0,0,.35)}
+.pill{aspect-ratio:1;border:0;border-radius:50%;padding:0;cursor:pointer;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#fff,#dfe3e8 70%);box-shadow:inset 0 -3px 6px rgba(0,0,0,.12),0 2px 3px rgba(0,0,0,.15)}
+.pill::after{content:"";width:64%;height:34%;border-radius:999px;background:linear-gradient(90deg,var(--pink) 50%,#fff 50%);box-shadow:inset 0 -2px 3px rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.25);transform:rotate(-28deg)}
+.pill.taken{cursor:default;background:radial-gradient(circle,#56606c 0 52%,#8d96a1 58%,transparent 62%),radial-gradient(circle at 35% 30%,#f3f5f7,#d5dae0 70%);box-shadow:inset 0 2px 5px rgba(0,0,0,.35)}
+.pill.taken::after{display:none}
+.pill.cur{outline:3px solid var(--gold);outline-offset:3px}
+.quiz{display:flex;flex-direction:column;gap:10px}
+.qq{font:700 19px/1.3 var(--display)!important}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{font:600 16px var(--body);text-align:left;color:var(--ink);background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.2);border-radius:12px;padding:13px 14px;cursor:pointer}
+.opt.right{border-color:#5be39a;background:rgba(91,227,154,.15)}
+.opt.wrong{border-color:#ff7a7a;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{min-height:22px;font-weight:800;font-size:15px!important}
+.fb.good{color:#5be39a}.fb.bad{color:#ff9a9a}
+.memo,.gallery{display:flex;flex-direction:column;gap:16px}
+.polaroid{margin:0;background:#fff;color:#2a2140;padding:10px 10px 14px;border-radius:4px;box-shadow:0 10px 24px rgba(0,0,0,.4);transform:rotate(var(--r,-1.5deg));animation:in .6s cubic-bezier(.2,.9,.3,1.2)}
+.polaroid img,.polaroid .ph{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:2px;background:#e8e4f0}
+.polaroid .ph{display:grid;place-items:center;font:700 13px var(--body);color:#8a7fa6;text-align:center;padding:10px}
+.polaroid figcaption{font:600 15px/1.35 var(--body);text-align:center;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:4px}
+.stats div{background:rgba(255,255,255,.07);border-radius:12px;padding:10px;text-align:center;font-size:12px;color:var(--dim)}
+.stats b{display:block;font:900 22px var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+a.btn{text-align:center;text-decoration:none}
 .letter .sign{font:900 22px var(--display);color:var(--pink)}
 .toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font:900 clamp(26px,8vw,40px) var(--display);text-align:center;z-index:4;pointer-events:none;text-shadow:0 4px 20px rgba(0,0,0,.5);animation:pop 1.1s ease-out forwards;width:90%}
 @keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%)}}
@@ -61,7 +86,7 @@ h2{font-size:clamp(28px,8.5vw,36px)}
 <canvas id="game" aria-hidden="true"></canvas>
 
 <div class="hud" id="hud" hidden>
-  <div class="row"><span><span class="lv" id="hLv"></span><br><span class="tt" id="hTt"></span></span><span class="sc" id="hSc"></span></div>
+  <div class="row"><span><span class="lv" id="hLv"></span><br><span class="tt" id="hTt"></span></span><span style="text-align:right"><span class="sc" id="hSc"></span><br><button class="mute" id="mute" type="button">Som ligado</button></span></div>
   <div class="meter"><i id="hBar"></i></div>
 </div>
 
@@ -76,7 +101,7 @@ h2{font-size:clamp(28px,8.5vw,36px)}
   <div class="card">
     <p class="eyebrow">Edição especial 38 anos</p>
     <h1>Madrinha<br><em>o jogo</em></h1>
-    <p>Feito de propósito para uma única jogadora: a madrinha Carolina. Três níveis da vida do teu afilhado e um nível final que só se passa com fôlego.</p>
+    <p>Feito de propósito para uma única jogadora: a madrinha Carolina. Três níveis da vida do teu afilhado, uma farmácia com perguntas e um nível final que só se passa com fôlego.</p>
     <p class="small">Liga o som. Segura o telemóvel na vertical e inclina-o para os lados para mexer o cesto. Também dá com o dedo.</p>
     <button class="btn" id="play" type="button">Jogar</button>
   </div>
@@ -100,6 +125,34 @@ h2{font-size:clamp(28px,8.5vw,36px)}
     <h2>Nível completo</h2>
     <p id="kTx"></p>
     <button class="btn" id="next" type="button">Continuar</button>
+  </div>
+</div>
+
+<!-- nível 4: farmácia -->
+<div class="overlay" id="pharm" hidden>
+  <div class="card">
+    <p class="eyebrow">Nível 4 de 4</p>
+    <h2>A farmácia da madrinha</h2>
+    <p id="phTx">Seis comprimidos, seis perguntas. Cada resposta certa desbloqueia uma memória.</p>
+    <div class="blister" id="blister"></div>
+    <div class="quiz" id="quiz" hidden>
+      <p class="qq" id="qq"></p>
+      <div class="opts" id="opts"></div>
+      <p class="fb" id="fb" aria-live="polite"></p>
+    </div>
+    <div class="memo" id="memo" hidden></div>
+    <button class="btn" id="toAlbum" type="button" hidden>Ver o memorial</button>
+  </div>
+</div>
+
+<!-- memorial de fotografias -->
+<div class="overlay" id="album" hidden>
+  <div class="card">
+    <p class="eyebrow">Memorial</p>
+    <h2>Nós os dois</h2>
+    <p>Algumas das melhores coisas que me aconteceram, e em todas estás tu.</p>
+    <div class="gallery" id="gallery"></div>
+    <button class="btn" id="toCake" type="button">Ir para o bolo</button>
   </div>
 </div>
 
@@ -127,6 +180,8 @@ h2{font-size:clamp(28px,8.5vw,36px)}
     <p>Não digo isto muitas vezes, por isso fiz-te um jogo. É mais fácil programar do que dizer em voz alta.</p>
     <p>Gosto muito de ti.</p>
     <p class="sign">O teu afilhado, Tiago</p>
+    <div class="stats" id="stats"></div>
+    <a class="btn" id="share" href="#" target="_blank" rel="noopener">Contar ao Tiago que passaste</a>
     <button class="btn ghost" id="again" type="button">Jogar outra vez</button>
   </div>
 </div>
@@ -139,15 +194,15 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const LEVELS=[
   {title:'O batizado',sky:['#1a1446','#4b2c86'],speed:1,
    intro:'Ano zero. Aceitaste ser madrinha sem saberes no que te estavas a meter. O bebé atira tudo ao chão. Apanha.',
-   good:['🍼','🧸','🎀','🍪'],bad:['💩'],badTip:'fralda suja, evitar',
+   who:'👶',good:['🍼','🧸','🎀','🍪'],bad:['💩'],badTip:'fralda suja, evitar',
    done:'O padre molhou o bebé. O bebé molhou-te a ti. Foi um bom começo.'},
   {title:'A infância',sky:['#07324a','#127a86'],speed:1.25,
    intro:'Anos, Natais e tardes de domingo. Os presentes estão a cair do céu. Não deixes nenhum chegar ao chão.',
-   good:['🎁','🍦','🎈','🧁'],bad:['📚'],badTip:'trabalhos de casa, evitar',
+   who:'🧒',good:['🎁','🍦','🎈','🧁'],bad:['📚'],badTip:'trabalhos de casa, evitar',
    done:'Nunca houve um ano sem um presente teu. Nem um. Eu contei.'},
   {title:'A adolescência',sky:['#3a0f33','#9b2e52'],speed:1.55,
    intro:'O afilhado cresceu e agora só tem fome. Apanha comida, muita comida, o mais depressa possível.',
-   good:['🍕','🍔','🍟','🍩'],bad:['🥦'],badTip:'brócolos, ele não come',
+   who:'🧑',good:['🍕','🍔','🍟','🍩'],bad:['🥦'],badTip:'brócolos, ele não come',
    done:'Já sou mais alto do que tu e continuo a precisar de ti. Isso não vai mudar.'}
 ];
 const TARGET=10;
@@ -162,14 +217,30 @@ const stars=Array.from({length:120},()=>({x:Math.random(),y:Math.random(),z:Math
 let skyTarget=['#120e2a','#2a1f5c'],skyRGB=skyTarget.map(h=>hex(h));
 
 // ---------- som, vibração, voz ----------
-let ac=null;
+let ac=null,muted=false;
 function audio(){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch(e){}}
-function tone(f,d,type='sine',v=.12,when=0){if(!ac)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+function tone(f,d,type='sine',v=.12,when=0){if(!ac||muted)return;const t=ac.currentTime+when,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}
-const sGood=()=>{tone(880+Math.random()*200,.12,'triangle',.12);tone(1320,.1,'sine',.06,.05)};
+const sGood=()=>{const f=660*Math.pow(2,Math.min(combo,12)/12);tone(f,.12,'triangle',.12);tone(f*1.5,.1,'sine',.06,.05)};
+// música de fundo: Dó, Sol, Lá menor, Fá em arpejo
+let mus={timer:null,step:0,next:0,bpm:110};
+const mf=n=>440*Math.pow(2,(n-69)/12);
+function musicStart(bpm){musicStop();if(!ac)return;mus.bpm=bpm;mus.step=0;mus.next=ac.currentTime+.1;
+  mus.timer=setInterval(()=>{while(mus.next<ac.currentTime+.2){const st=mus.step,bar=Math.floor(st/8)%4,root=[48,43,45,41][bar],ch=bar===2?[0,3,7]:[0,4,7],i=st%8;
+    const when=mus.next-ac.currentTime;tone(mf(root+12+ch[i%3]+(i>=4?12:0)),.16,'square',.025,when);if(i%4===0)tone(mf(root-12),.35,'triangle',.07,when);if(i%2===1)tone(6000,.02,'square',.006,when);
+    mus.next+=60/mus.bpm/2;mus.step++}},40)}
+function musicStop(){if(mus.timer){clearInterval(mus.timer);mus.timer=null}}
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'Som desligado':'Som ligado';try{if(muted)speechSynthesis.cancel()}catch(e){}};
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1200)}
+// emojis desenhados uma vez numa imagem própria (o Safari pinta os emojis com o fillStyle do canvas)
+const SPR={};
+function spr(e,size){const k=e+size;if(SPR[k])return SPR[k];const c=document.createElement('canvas'),w=size*1.4;c.width=c.height=Math.ceil(w*2);
+  const x=c.getContext('2d');x.scale(2,2);x.fillStyle='#000';x.textAlign='center';x.textBaseline='middle';
+  x.font=`${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;x.fillText(e,w/2,w/2+size*.06);return SPR[k]=c}
+function drawSpr(e,size,x,y){const w=size*1.4;ctx.drawImage(spr(e,size),x-w/2,y-w/2,w,w)}
 const sBad=()=>{tone(160,.3,'sawtooth',.08);tone(120,.3,'square',.05,.05)};
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
-function say(t){try{const s=speechSynthesis;if(!s||!window.SpeechSynthesisUtterance)return;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';
+function say(t){if(muted)return;try{const s=speechSynthesis;if(!s||!window.SpeechSynthesisUtterance)return;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';
   const v=s.getVoices().find(x=>/pt[-_]PT/i.test(x.lang))||s.getVoices().find(x=>/^pt/i.test(x.lang));if(v)u.voice=v;s.speak(u)}catch(e){}}
 function parabens(){ // "Parabéns a você", melodia tradicional
   if(!ac)return;const N={G4:392,A4:440,B4:494,C5:523,D5:587,E5:659,F5:698,G5:784};
@@ -188,36 +259,90 @@ addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight')keys=0
 async function askTilt(){try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')await DeviceOrientationEvent.requestPermission()}catch(e){}}
 
 // ---------- estado ----------
-let mode='menu',lv=0,score=0,items=[],parts=[],floats=[],basket={x:0,vx:0},shake=0,spawnT=0,last=0;
+let combo=0,hugT=0,thrower={x:0,dir:1,bob:0},stats={caught:0,missed:0,t0:0,cake:0},mode='menu',lv=0,score=0,items=[],parts=[],floats=[],basket={x:0,vx:0},shake=0,spawnT=0,last=0;
 
-function show(id){['start','intro','clear','cakeIntro','end'].forEach(k=>$(k).hidden=k!==id)}
-$('play').onclick=async()=>{audio();tone(660,.1);tone(990,.15,'sine',.1,.1);await askTilt();lv=0;openLevel()};
+function show(id){['start','intro','clear','pharm','album','cakeIntro','end'].forEach(k=>$(k).hidden=k!==id)}
+$('play').onclick=async()=>{audio();tone(660,.1);tone(990,.15,'sine',.1,.1);await askTilt();lv=0;stats={caught:0,missed:0,t0:performance.now(),cake:0};openLevel()};
 function openLevel(){
   const L=LEVELS[lv];skyTarget=L.sky;mode='menu';$('hud').hidden=true;
-  $('iLv').textContent=`Nível ${lv+1} de 3`;$('iTt').textContent=L.title;$('iTx').textContent=L.intro;
-  $('iItems').innerHTML=`<span><b>${L.good.join('')}</b> apanhar</span><span><b>${L.bad[0]}</b> ${L.badTip}</span>`;
+  $('iLv').textContent=`Nível ${lv+1} de 4`;$('iTt').textContent=L.title;$('iTx').textContent=L.intro;
+  $('iItems').innerHTML=`<span><b>${L.good.join('')}</b> apanhar</span><span><b>${L.bad[0]}</b> ${L.badTip}</span><span><b>💖</b> abraço: o cesto cresce e puxa tudo</span>`;
   show('intro');say(`Nível ${lv+1}. ${L.title}.`);
 }
 $('go').onclick=()=>{audio();show(null);startLevel()};
 function startLevel(){
-  const L=LEVELS[lv];score=0;items=[];spawnT=0;basket.x=W/2;basket.vx=0;pointerX=null;mode='play';
+  const L=LEVELS[lv];score=0;combo=0;hugT=0;items=[];spawnT=.6;basket.x=W/2;basket.vx=0;pointerX=null;mode='play';thrower.x=W/2;
   $('hud').hidden=false;$('hLv').textContent=`Nível ${lv+1}`;$('hTt').textContent=L.title;updHud();
+  musicStart([112,124,138][lv]);
+  if(lv===0)setTimeout(()=>toast(tilt!=null?'Inclina o telemóvel':'Arrasta com o dedo'),400);
 }
 function updHud(){$('hSc').textContent=`${score} / ${TARGET}`;$('hBar').style.width=(score/TARGET*100)+'%'}
 function levelDone(){
-  mode='menu';$('hud').hidden=true;burst(W/2,H/2,80);tone(523,.15,'triangle',.12);tone(659,.15,'triangle',.12,.12);tone(784,.3,'triangle',.12,.24);buzz([40,40,120]);
-  setTimeout(()=>{$('kLv').textContent=`Nível ${lv+1} de 3 · ${LEVELS[lv].title}`;$('kTx').textContent=LEVELS[lv].done;show('clear')},900);
+  mode='menu';musicStop();$('hud').hidden=true;burst(W/2,H/2,80);tone(523,.15,'triangle',.12);tone(659,.15,'triangle',.12,.12);tone(784,.3,'triangle',.12,.24);buzz([40,40,120]);
+  setTimeout(()=>{$('kLv').textContent=`Nível ${lv+1} de 4 · ${LEVELS[lv].title}`;$('kTx').textContent=LEVELS[lv].done;show('clear')},900);
 }
-$('next').onclick=()=>{audio();lv++;if(lv<LEVELS.length)openLevel();else{skyTarget=['#0b0817','#241238'];show('cakeIntro');say('Nível final. Trinta e oito velas.')}};
+$('next').onclick=()=>{audio();lv++;if(lv<LEVELS.length)openLevel();else openPharm()};
+function openCake(){skyTarget=['#0b0817','#241238'];show('cakeIntro');say('Nível final. Trinta e oito velas.')}
 
 function spawn(){
-  const L=LEVELS[lv],bad=Math.random()<.24;
-  items.push({x:30+Math.random()*(W-60),y:-40,vy:(150+Math.random()*90)*L.speed,rot:Math.random()*6,vr:(Math.random()-.5)*3,e:bad?L.bad[0]:L.good[Math.random()*L.good.length|0],bad,s:40+Math.random()*10});
+  const L=LEVELS[lv],r=Math.random(),hug=r<.07,bad=!hug&&r<.31;
+  items.push({hug,x:Math.max(30,Math.min(W-30,thrower.x+(Math.random()-.5)*60)),y:thrower.y+10,vx:(Math.random()-.5)*90,vy:(150+Math.random()*90)*L.speed,rot:Math.random()*6,vr:(Math.random()-.5)*3,e:hug?'💖':bad?L.bad[0]:L.good[Math.random()*L.good.length|0],bad,s:40+Math.random()*10});
 }
 function burst(x,y,n,cols=['#ffc94a','#ff5d8f','#ffffff','#8fd3ff']){
   for(let k=0;k<n;k++){const a=Math.random()*Math.PI*2,v=Math.random()*380+80;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,life:1,c:cols[Math.random()*cols.length|0],s:Math.random()*4+2})}
 }
 function floatText(x,y,t,c){floats.push({x,y,t,c,life:1})}
+
+// ---------- nível 4: farmácia ----------
+// Troca as perguntas e as fotos por coisas vossas. As fotos vão para a pasta fotos/ com estes nomes.
+const PERGUNTAS=[
+  {q:'Quantas velas vais ter de apagar hoje?',o:['36','38','Isso não se pergunta a uma senhora'],c:[1,2],ok:'Certo. Mas ninguém diria.',foto:'fotos/1.jpg',leg:'Foto 1'},
+  {q:'Qual é o dia mais importante do calendário?',o:['25 de dezembro','22 de novembro','Sexta-feira às seis da tarde'],c:[1],ok:'Claro que sim. O resto do ano é só espera.',foto:'fotos/2.jpg',leg:'Foto 2'},
+  {q:'Quem é o melhor afilhado do mundo?',o:['O Tiago','O Tiago','O Tiago'],c:[0,1,2],ok:'Resposta certíssima. Não havia outra.',foto:'fotos/3.jpg',leg:'Foto 3'},
+  {q:'O que é que a madrinha nunca disse ao afilhado?',o:['Estás tão crescido','Já comeste?','Não'],c:[2],ok:'Exato. Nunca. Nem uma vez.',foto:'fotos/4.jpg',leg:'Foto 4'},
+  {q:'Onde vive a madrinha mais famosa deste jogo?',o:['Aveiro','Veneza','As duas coisas, Aveiro é a Veneza portuguesa'],c:[0,2],ok:'Certo. Com moliceiros e ovos moles incluídos.',foto:'fotos/5.jpg',leg:'Foto 5'},
+  {q:'O que é que esta prenda tem a mais do que uma prenda comprada?',o:['Bugs','Muitas horas do afilhado à frente do computador','As duas coisas'],c:[2],ok:'Pois tem. E fazia tudo outra vez.',foto:'fotos/6.jpg',leg:'Foto 6'}
+];
+const ERRADO=['Quase. Tenta outra vez.','Hmm, não é bem isso.','Essa não. Mais uma tentativa.'];
+let qi=-1,qdone=0;
+function crack(){if(!ac||muted)return;const n=ac.sampleRate*.09|0,buf=ac.createBuffer(1,n,ac.sampleRate),d=buf.getChannelData(0);
+  for(let k=0;k<n;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/n,3);
+  const src=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();src.buffer=buf;f.type='highpass';f.frequency.value=1800;g.gain.value=.5;src.connect(f).connect(g).connect(ac.destination);src.start()}
+function polaroid(p,k){const f=document.createElement('figure');f.className='polaroid';f.style.setProperty('--r',(k%2?1.6:-1.6)+'deg');
+  const im=new Image();im.alt=p.leg;im.loading='lazy';im.src=p.foto;im.onerror=()=>{const d=document.createElement('div');d.className='ph';d.textContent=`${p.leg} (ainda por adicionar)`;im.replaceWith(d)};
+  const c=document.createElement('figcaption');c.textContent=p.leg;f.append(im,c);return f}
+function openPharm(){
+  mode='menu';skyTarget=['#14283a','#2f5a6e'];qi=-1;qdone=0;$('memo').innerHTML='';$('memo').hidden=true;$('quiz').hidden=true;$('toAlbum').hidden=true;
+  const b=$('blister');b.innerHTML='';
+  PERGUNTAS.forEach((_,k)=>{const x=document.createElement('button');x.type='button';x.className='pill';x.setAttribute('aria-label',`Comprimido ${k+1}`);x.onclick=()=>takePill(k,x);b.appendChild(x)});
+  $('phTx').textContent='Seis comprimidos, seis perguntas. Tira um do blister. Cada resposta certa desbloqueia uma memória.';
+  show('pharm');say('Nível quatro. A farmácia da madrinha.');
+}
+function takePill(k,x){
+  if(x.classList.contains('taken')||qi>=0)return;audio();crack();buzz(25);
+  x.classList.add('taken','cur');qi=k;const P=PERGUNTAS[k];
+  $('qq').textContent=P.q;$('fb').textContent='';$('fb').className='fb';$('opts').innerHTML='';
+  P.o.forEach((t,i)=>{const o=document.createElement('button');o.type='button';o.className='opt';o.textContent=t;o.onclick=()=>answer(i,o);$('opts').appendChild(o)});
+  $('quiz').hidden=false;$('quiz').scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
+}
+function answer(i,o){
+  const P=PERGUNTAS[qi];
+  if(P.c.includes(i)){
+    o.classList.add('right');[...$('opts').children].forEach(b=>b.disabled=true);$('fb').textContent=P.ok;$('fb').className='fb good';
+    sGood();buzz(30);qdone++;
+    const pol=polaroid(P,qi);$('memo').hidden=false;$('memo').prepend(pol);
+    document.querySelector('.pill.cur')?.classList.remove('cur');
+    setTimeout(()=>{pol.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'})},300);
+    qi=-1;
+    if(qdone===PERGUNTAS.length){$('toAlbum').hidden=false;$('phTx').textContent='Blister vazio. Todas as memórias desbloqueadas.';tone(523,.15,'triangle',.12);tone(784,.3,'triangle',.12,.15)}
+    else setTimeout(()=>{if(qi<0)$('quiz').hidden=true},1600);
+  }else{
+    o.classList.remove('wrong');void o.offsetWidth;o.classList.add('wrong');sBad();buzz([60,40,60]);
+    $('fb').textContent=ERRADO[Math.random()*ERRADO.length|0];$('fb').className='fb bad';
+  }
+}
+$('toAlbum').onclick=()=>{audio();const g=$('gallery');g.innerHTML='';PERGUNTAS.forEach((p,k)=>g.appendChild(polaroid(p,k)));show('album');$('album').scrollTop=0};
+$('toCake').onclick=()=>{audio();openCake()};
 
 // ---------- bolo ----------
 let candles=[],cake={},tapOnly=false,micAn=null,micBuf=null,lit=38,finished=false,smoke=[];
@@ -230,7 +355,7 @@ function layoutCake(){
   candles.forEach(c=>{c.x=cx+Math.cos(c.a)*cw/2*c.rf;c.y=top+Math.sin(c.a)*ry*c.rf;c.h=Math.max(22,cw*.075)});
 }
 async function startCake(useMic){
-  audio();mode='cake';finished=false;candles=[];smoke=[];lit=38;layoutCake();show(null);$('cakehud').hidden=false;updCake();
+  audio();musicStop();stats.cake=performance.now();mode='cake';finished=false;candles=[];smoke=[];lit=38;layoutCake();show(null);$('cakehud').hidden=false;updCake();
   tapOnly=!useMic;
   if(useMic){
     try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const src=ac.createMediaStreamSource(st);micAn=ac.createAnalyser();micAn.fftSize=1024;src.connect(micAn);micBuf=new Float32Array(micAn.fftSize);micAn._st=st}
@@ -247,11 +372,16 @@ function tapCandles(x,y){candles.forEach(c=>{if(c.on&&Math.hypot(c.x-x,c.y-c.h-y
 function micLevel(){if(!micAn)return 0;micAn.getFloatTimeDomainData(micBuf);let s=0;for(let k=0;k<micBuf.length;k++)s+=micBuf[k]*micBuf[k];return Math.sqrt(s/micBuf.length)}
 function win(){
   if(finished)return;finished=true;buzz([100,60,100,60,400]);
+  const secs=Math.max(1,Math.round((performance.now()-stats.cake)/1000)),mins=Math.max(1,Math.round((performance.now()-stats.t0)/60000));
+  $('stats').innerHTML=`<div><b>${stats.caught}</b>apanhados</div><div><b>${secs}s</b>para 38 velas</div><div><b>${mins} min</b>de jogo</div>`;
+  const msg=`Tiago, passei o Madrinha, o jogo! Apanhei ${stats.caught} coisas e apaguei as 38 velas em ${secs} segundos. Obrigada, gosto muito de ti.`;
+  $('share').href='https://wa.me/?text='+encodeURIComponent(msg);
+  $('share').onclick=e=>{if(navigator.share){e.preventDefault();navigator.share({text:msg}).catch(()=>{})}};
   if(micAn&&micAn._st)micAn._st.getTracks().forEach(t=>t.stop());
   setTimeout(()=>{$('cakehud').hidden=true;mode='party';parabens();say('Parabéns, madrinha Carolina!')},900);
   setTimeout(()=>show('end'),reduce?900:4200);
 }
-$('again').onclick=()=>{audio();show('start');mode='menu';skyTarget=['#120e2a','#2a1f5c'];candles=[]};
+$('again').onclick=()=>{audio();musicStop();show('start');mode='menu';skyTarget=['#120e2a','#2a1f5c'];candles=[]};
 
 // ---------- ciclo ----------
 let fwT=0;
@@ -281,32 +411,46 @@ function frame(t){
   requestAnimationFrame(frame);
 }
 function play(dt){
+  const L=LEVELS[lv],by=H-Math.max(80,H*.13),hug=hugT>0,reach=hug?84:52;
+  if(hug)hugT-=dt;
   // cesto
-  const by=H-Math.max(80,H*.13);
   if(tilt!=null&&pointerX==null){basket.vx+=(tilt*55-basket.vx)*Math.min(1,dt*8)}
   else if(keys){basket.vx=keys*520}
   else if(pointerX!=null){basket.vx=(pointerX-basket.x)*12}
   else basket.vx*=.9;
   basket.x=Math.max(40,Math.min(W-40,basket.x+basket.vx*dt));
-  // gerar
-  spawnT-=dt;if(spawnT<=0){spawn();spawnT=(.75+Math.random()*.45)/LEVELS[lv].speed}
+  // afilhado lá em cima, a atirar coisas
+  thrower.y=Math.max(140,H*.19);thrower.bob+=dt*6;
+  thrower.x+=thrower.dir*(90+60*L.speed)*dt;if(thrower.x<50||thrower.x>W-50){thrower.dir*=-1;thrower.x=Math.max(50,Math.min(W-50,thrower.x))}
+  if(Math.random()<dt*.6)thrower.dir*=-1;
+  spawnT-=dt;if(spawnT<=0){spawn();spawnT=(.75+Math.random()*.45)/L.speed;thrower.bob=0}
+  const tb=Math.abs(Math.sin(thrower.bob))*-6;
+  const tg=ctx.createRadialGradient(thrower.x,thrower.y,0,thrower.x,thrower.y,60);tg.addColorStop(0,'rgba(143,211,255,.25)');tg.addColorStop(1,'rgba(143,211,255,0)');ctx.fillStyle=tg;ctx.fillRect(thrower.x-60,thrower.y-60,120,120);
+  drawSpr(L.who,50,thrower.x,thrower.y+tb);
+  ctx.fillStyle='#fff7ee';ctx.font='800 9px Unbounded, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('AFILHADO',thrower.x,thrower.y+38);
   // objetos
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  items.forEach(it=>{it.y+=it.vy*dt;it.rot+=it.vr*dt;
-    if(!it.gone&&it.y>by-30&&it.y<by+16&&Math.abs(it.x-basket.x)<52){it.gone=true;
-      if(it.bad){score=Math.max(0,score-1);shake=14;sBad();buzz([80,40,80]);floatText(it.x,by-50,'-1','#ff8a8a');burst(it.x,by-20,14,['#7a5a3a','#a07850'])}
-      else{score++;sGood();buzz(18);floatText(it.x,by-50,'+1','#ffc94a');burst(it.x,by-20,22)}
+  items.forEach(it=>{
+    if(hug&&!it.bad&&Math.abs(it.y-by)<H*.6){it.x+=(basket.x-it.x)*Math.min(1,dt*3.5)}
+    it.y+=it.vy*dt;it.x+=it.vx*dt;it.vx*=.98;it.rot+=it.vr*dt;
+    if(!it.gone&&it.y>by-34&&it.y<by+18&&Math.abs(it.x-basket.x)<reach){it.gone=true;
+      if(it.hug){hugT=6;combo++;toast('Abraço!');[523,659,784,1047].forEach((f,k)=>tone(f,.15,'triangle',.1,k*.06));buzz([30,30,30,30,80]);burst(it.x,by-20,50,['#ff5d8f','#ffb3c9','#ffffff'])}
+      else if(it.bad){score=Math.max(0,score-1);combo=0;shake=14;sBad();buzz([80,40,80]);floatText(it.x,by-50,'-1','#ff8a8a');burst(it.x,by-20,14,['#7a5a3a','#a07850'])}
+      else{score++;combo++;stats.caught++;sGood();buzz(18);floatText(it.x,by-50,combo>=3?`Combo x${combo}`:'+1','#ffc94a');burst(it.x,by-20,22+combo*2)}
       updHud();if(score>=TARGET)levelDone()}
-    if(!it.gone){ctx.save();ctx.translate(it.x,it.y);ctx.rotate(Math.sin(it.rot)*.4);ctx.font=`${it.s}px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif`;
-      if(!it.bad){ctx.shadowColor='rgba(255,201,74,.6)';ctx.shadowBlur=18}ctx.fillText(it.e,0,0);ctx.restore()}
+    if(!it.gone&&it.y>H+30){it.gone=true;if(!it.bad&&!it.hug){stats.missed++;combo=0}}
+    if(!it.gone){
+      if(!it.bad){const r=ctx.createRadialGradient(it.x,it.y,0,it.x,it.y,it.s);r.addColorStop(0,it.hug?'rgba(255,93,143,.45)':'rgba(255,201,74,.3)');r.addColorStop(1,'rgba(255,201,74,0)');ctx.fillStyle=r;ctx.fillRect(it.x-it.s,it.y-it.s,it.s*2,it.s*2)}
+      ctx.save();ctx.translate(it.x,it.y);ctx.rotate(Math.sin(it.rot)*.4);drawSpr(it.e,it.s,0,0);ctx.restore()}
   });
-  items=items.filter(it=>!it.gone&&it.y<H+60);
-  // desenhar cesto
-  ctx.save();ctx.translate(basket.x,by);ctx.rotate(Math.max(-.25,Math.min(.25,basket.vx/2400)));
-  const gl=ctx.createRadialGradient(0,0,0,0,0,90);gl.addColorStop(0,'rgba(255,93,143,.35)');gl.addColorStop(1,'rgba(255,93,143,0)');ctx.fillStyle=gl;ctx.fillRect(-90,-90,180,180);
-  ctx.font='64px system-ui,"Apple Color Emoji","Segoe UI Emoji",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🧺',0,0);
-  ctx.font='800 10px Unbounded, sans-serif';ctx.fillStyle='#fff7ee';ctx.fillText('MADRINHA',0,40);
+  items=items.filter(it=>!it.gone);
+  // cesto
+  const sc=hug?1.45+Math.sin(performance.now()/90)*.04:1;
+  ctx.save();ctx.translate(basket.x,by);ctx.rotate(Math.max(-.25,Math.min(.25,basket.vx/2400)));ctx.scale(sc,sc);
+  const gl=ctx.createRadialGradient(0,0,0,0,0,90);gl.addColorStop(0,hug?'rgba(255,93,143,.6)':'rgba(255,93,143,.32)');gl.addColorStop(1,'rgba(255,93,143,0)');ctx.fillStyle=gl;ctx.fillRect(-90,-90,180,180);
+  drawSpr('🧺',62,0,0);
+  ctx.fillStyle='#fff7ee';ctx.font='800 10px Unbounded, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('MADRINHA',0,42);
   ctx.restore();
+  if(hug){ctx.fillStyle='rgba(255,93,143,.9)';ctx.fillRect(0,H-6,W*(hugT/6),6)}
 }
 function drawCake(dt,t){
   const {cx,cy,cw,ch}=cake;

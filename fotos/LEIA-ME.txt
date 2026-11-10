@@ -1,0 +1,2 @@
+Põe aqui as fotografias com os nomes 1.jpg, 2.jpg, 3.jpg, 4.jpg, 5.jpg e 6.jpg.
+As legendas e as perguntas estão na lista PERGUNTAS em index.html.
