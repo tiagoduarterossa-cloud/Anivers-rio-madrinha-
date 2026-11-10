@@ -11,3 +11,8 @@ Tudo está em `index.html`. Os textos de cada nível estão na lista `LEVELS` e 
 
 Para funcionar no telemóvel, ativa o GitHub Pages: https://tiagoduarterossa-cloud.github.io/Anivers-rio-madrinha-/
 A inclinação e o microfone só funcionam por https (GitHub Pages), não ao abrir o ficheiro diretamente.
+
+## Para imprimir (pasta `impressao/`)
+
+- `capa-A4.pdf`: capa para uma caixa de DVD normal (verso, lombada e frente), com screenshots do jogo e o QR code. A4, tamanho real.
+- `cartao-A4.pdf`: dois cartões de ativação com o QR code, para ir dentro da caixa.
