@@ -78,7 +78,7 @@ const CARTA=[
 const FINAL_VOZ={id:'f01',texto:'Parabéns, madrinha. Gosto muito de ti.'};
 
 /* Texto que se ouve no audioguia de cada obra */
-function falaObra(o,num){return `Obra ${num}. ${o.t}. ${o.tech}. ${o.tx}`}
+function falaObra(o,num){return `Obra ${num}. ${o.t}. ${o.tech.replace(/\.$/,"")}. ${o.tx}`}
 
 /* Lista de todas as falas, para o estúdio de gravação */
 function todasAsFalas(){
