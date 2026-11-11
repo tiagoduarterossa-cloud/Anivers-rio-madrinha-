@@ -303,23 +303,34 @@ function droneStop(){droneNodes.forEach(({o,g})=>{try{g.gain.setTargetAtTime(0,a
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 function voice(){const v=speechSynthesis.getVoices();return v.find(x=>/pt[-_]PT/i.test(x.lang))||v.find(x=>/^pt/i.test(x.lang))}
 function say(t,opt={},onend){try{if(!t)return;const u=new SpeechSynthesisUtterance(t);u.lang='pt-PT';u.rate=opt.rate||.92;u.pitch=opt.pitch||.8;const v=voice();if(v)u.voice=v;if(onend)u.onend=onend;speechSynthesis.speak(u)}catch(e){onend&&onend()}}
-function hush(){try{speechSynthesis.cancel()}catch(e){}if(curAudio){curAudio.pause();curAudio=null}}
-/* A tua voz: tenta audio/<id>.m4a, .mp3, .webm, .wav. Se não houver, usa a voz sintética. */
-let curAudio=null;const audioCache={};
+function hush(){try{speechSynthesis.cancel()}catch(e){}try{voiceEl.onended=null;voiceEl.pause()}catch(e){}}
+/* A tua voz: tenta audio/<id>.m4a, .mp3, ... Se não houver, usa a voz sintética.
+   No iPhone, o Safari só deixa tocar som depois de um toque. Por isso há UM leitor, desbloqueado no primeiro toque
+   ("Entrar no museu") e reutilizado em todas as falas. */
+const voiceEl=new Audio();voiceEl.preload='auto';voiceEl.setAttribute('playsinline','');
+const SILENT='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+let voiceUnlocked=false;
+function unlockVoice(){if(voiceUnlocked)return;voiceUnlocked=true;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+  try{voiceEl.src=SILENT;const p=voiceEl.play();if(p)p.catch(()=>{})}catch(e){}}
+const audioCache={};
 function findAudio(id){if(id in audioCache)return audioCache[id];
   audioCache[id]=(async()=>{for(const ext of ['m4a','mp3','webm','wav','aac']){const src=`audio/${id}.${ext}`;
-    const ok=await new Promise(r=>{const a=new Audio();a.preload='metadata';a.onloadedmetadata=()=>r(a);a.onerror=()=>r(null);a.src=src});if(ok)return src}return null})();
+    try{const r=await fetch(src,{method:'HEAD',cache:'force-cache'});if(r.ok)return src}catch(e){}
+    try{const r=await fetch(src,{cache:'force-cache'});if(r.ok)return src}catch(e){}}return null})();
   return audioCache[id]}
 async function speak(voz,texto,opt,onend){
-  if(!voz&&!texto){onend&&onend();return 0}
+  if(!voz&&!texto){onend&&onend();return}
   const src=voz&&voz.id?await findAudio(voz.id):null;
-  if(src){hush();const a=new Audio(src);curAudio=a;a.onended=()=>{if(curAudio===a)curAudio=null;onend&&onend()};try{await a.play()}catch(e){onend&&onend()}return (a.duration||0)*1000}
-  say(texto||(voz&&voz.texto),opt,onend);return 0}
+  if(src){hush();let done=false;const fin=()=>{if(done)return;done=true;voiceEl.onended=null;onend&&onend()};
+    voiceEl.onended=fin;voiceEl.onerror=fin;voiceEl.src=src;
+    try{await voiceEl.play()}catch(e){fin()}return}
+  say(texto||(voz&&voz.texto),opt,onend)}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---------- navegação entre atos ---------- */
 function act(id){['ticket','cinema','museum','finale'].forEach(k=>$(k).hidden=k!==id)}
 async function askSensors(){try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')await DeviceOrientationEvent.requestPermission()}catch(e){}}
-$('enter').onclick=async()=>{audio();chime();buzz(20);await askSensors();act('cinema');playTrailer()};
+$('enter').onclick=async()=>{unlockVoice();audio();chime();buzz(20);CENAS.forEach(c=>{if(c.voz)findAudio(c.voz.id)});await askSensors();act('cinema');playTrailer()};
 
 /* ---------- trailer ---------- */
 const dust=$('dust'),dx=dust.getContext('2d');let motes=Array.from({length:70},()=>({x:Math.random(),y:Math.random(),v:Math.random()*.0006+.0002,s:Math.random()*1.6+.3}));
@@ -334,8 +345,9 @@ async function playTrailer(){
     const el=document.createElement('div');el.className='scene';el.innerHTML=c.h;
     if(c.foto){const im=await loadImg(c.foto);if(im){im.alt='';el.prepend(im)}}
     $('stage').innerHTML='';$('stage').appendChild(el);requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
-    if(c.hit)boom(c.hit);const ms=c.voz?await speak(c.voz,null,{rate:.85,pitch:.6}):0;
-    await new Promise(r=>setTimeout(r,reduce?900:Math.max(c.d,ms+400)));if(run!==trailerRun)return;
+    if(c.hit)boom(c.hit);
+    const falou=c.voz?new Promise(r=>speak(c.voz,null,{rate:.85,pitch:.6},r)):null;
+    await Promise.all([sleep(reduce?900:c.d),falou?Promise.race([falou,sleep(20000)]).then(()=>sleep(450)):null]);if(run!==trailerRun)return;
     el.classList.remove('on');await new Promise(r=>setTimeout(r,650));
   }
   if(run===trailerRun)enterMuseum();
