@@ -24,6 +24,7 @@ Para funcionar no telemóvel, ativa o GitHub Pages: https://tiagoduarterossa-clo
 ## Parte física (pasta `impressao/`)
 
 - `tabela-e-bilhete-A4.pdf`: o bilhete de entrada (170 × 66 mm, com QR) e duas tabelas de museu com o QR do audioguia (150 × 92 mm para a parede e 100 × 56 mm para a moldura).
+- `verso-A4.pdf`: a etiqueta para as costas da moldura (130 × 80 mm), com o QR que abre só a obra 6 (`banco-do-nuno.html`).
 - `jornal-A4.pdf`: o Diário da Família de 22/11/1988 em papel, com o QR da edição digital. Usa `fotos/bebe.jpg` se existir.
 
 Os outros protótipos estão na pasta `prototipos/`.
