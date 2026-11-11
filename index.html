@@ -351,11 +351,11 @@ SALAS.forEach((s,ri)=>{
   const light=document.createElement('div');light.className='light';r.appendChild(light);
   s.obras.forEach((o,oi)=>{total++;const id=`${ri}-${oi}`;o.id=id;o.num=total;
     const b=document.createElement('button');b.type='button';b.className='work';b.dataset.id=id;
-    const big=s.obras.length===1;const W=big?'min(62vw,300px)':'min(29vw,170px)',Hh=big?'min(46vw,225px)':'min(36vw,210px)';if(!big){b.style.setProperty('--fp','9px');b.style.setProperty('--mp','7px')}
+    const big=s.obras.length===1;const P=o.ar==='p';const W=big?(P?'min(48vw,232px)':'min(62vw,300px)'):(P?'min(29vw,160px)':'min(36vw,200px)'),Hh=big?(P?'min(64vw,310px)':'min(46vw,225px)'):(P?'min(39vw,215px)':'min(27vw,150px)');if(!big){b.style.setProperty('--fp','9px');b.style.setProperty('--mp','7px')}
     b.style.setProperty('--w',W);b.style.setProperty('--h',Hh);b.style.setProperty('--es',big?'86px':'56px');
     if(o.jornal)b.style.setProperty('--frame','linear-gradient(135deg,#1b1b1b,#3a3a3a)');
     b.innerHTML=`<span class="badge">${o.num}</span><span class="frame"><span class="mat"><span class="art ph" style="--paint:${o.paint}">${o.e}</span></span></span><span class="plaque">${o.t}<small>${o.y}</small></span>`;
-    loadImg(o.foto).then(im=>{if(!im)return;im.className='art';im.alt=o.t;b.querySelector('.ph').replaceWith(im)});
+    loadImg(o.foto).then(im=>{if(!im)return;im.className='art';im.alt=o.t;im.style.objectPosition=o.ar==='p'?'50% 28%':'50% 40%';b.querySelector('.ph').replaceWith(im)});
     b.onclick=()=>openWork(o);w.appendChild(b)});
   r.appendChild(w);
   if(!s.final){const bench=document.createElement('div');bench.className='bench';r.appendChild(bench)}
