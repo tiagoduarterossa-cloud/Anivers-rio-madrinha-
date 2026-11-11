@@ -60,9 +60,9 @@ const CENAS=[
   {h:'<div class="s">Nem sempre por perto</div>',voz:{id:'t05',texto:'Nem sempre por perto.'},d:2800,hit:1,foto:'fotos/4.jpg'},
   {h:'<div class="s">Mas sempre lá</div>',voz:{id:'t06',texto:'Mas sempre lá.'},d:3000,hit:2},
   {h:'<div class="q">"Estás tão crescido!"</div><div class="s" style="margin-top:10px;color:var(--muted)">Ela, sempre que me vê</div>',voz:{id:'t07',texto:'Estás tão crescido!'},d:3800,foto:'fotos/5.jpg'},
-  {h:'<div class="s">Este inverno</div>',voz:{id:'t08',texto:'Este inverno, a lenda faz trinta e oito.'},d:2000,hit:1},
-  {h:'<div class="s">a lenda faz</div>',d:1500},
-  {h:'<div class="big"><em>38</em></div>',d:2500,hit:3},
+  {h:'<div class="s">Este inverno</div>',voz:{id:'t08',texto:'Este inverno,'},d:1600,hit:1},
+  {h:'<div class="s">a lenda faz</div>',voz:{id:'t08b',texto:'a lenda faz'},d:1300},
+  {h:'<div class="big"><em>38</em></div>',voz:{id:'t08c',texto:'trinta e oito.'},d:2500,hit:3},
   {h:'<div class="cr">Uma exposição de <b>o afilhado</b><br>Curadoria <b>o afilhado</b><br>Orçamento <b>nenhum</b><br>Com <b>Carolina Breda</b></div>',d:4200},
   {h:'<div class="big" style="font-size:clamp(40px,12vw,72px)">Museu da Madrinha</div><div class="s" style="margin-top:8px;color:var(--gold)">A exposição está aberta</div>',voz:{id:'t09',texto:'O Museu da Madrinha. A exposição está aberta.'},d:4200,hit:3}
 ];
