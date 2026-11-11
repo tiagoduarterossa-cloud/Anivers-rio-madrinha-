@@ -32,7 +32,7 @@ h2{font:600 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color
 <p class="lead">Aqui gravas as falas do museu com a tua voz. Cada gravação substitui a voz sintética.</p>
 <div class="how"><b>Como fazer</b><ol>
   <li>Abre esta página no telemóvel e vai para um sítio sem barulho.</li>
-  <li>Carrega em <b>Ouvir exemplo</b> para ouvires o ritmo e as pausas. A voz do exemplo é de robô, a tua vai ser melhor.</li>
+  <li>Carrega em <b>Ouvir exemplo</b> para ouvires o ritmo e as pausas, com a voz do teu telemóvel. Serve só de guia: a tua vai ter mais graça.</li>
   <li>Em cada fala, carrega em <b>Gravar</b>, lê o texto e carrega em <b>Parar</b>. Ouve e repete se quiseres.</li>
   <li>Carrega em <b>Guardar</b>. O ficheiro sai já com o nome certo (por exemplo <b>t01.m4a</b>).</li>
   <li>No fim, põe todos os ficheiros na pasta <b>audio/</b> do repositório (no GitHub: Add file, Upload files) ou envia-mos.</li>
@@ -67,9 +67,25 @@ FALAS.forEach(f=>{
       audio=new Audio(url);play.hidden=false;save.hidden=false;save.href=url;save.download=`${f.id}.${EXT}`;done.add(f.id);el.classList.add('done');prog()};
     mr.start();rec.classList.add('on');rec.textContent='Parar';t0=Date.now();tick=setInterval(()=>t.textContent=((Date.now()-t0)/1000).toFixed(1)+' s',100)};
   play.onclick=()=>{if(audio){audio.currentTime=0;audio.play()}};
-  const exBtn=el.querySelector('.ex');let ex=null;
-  exBtn.onclick=()=>{if(ex&&!ex.paused){ex.pause();exBtn.textContent='Ouvir exemplo';return}document.querySelectorAll('audio').forEach(a=>a.pause());ex=new Audio(`audio/exemplos/${f.id}.m4a`);ex.onended=()=>exBtn.textContent='Ouvir exemplo';ex.onerror=()=>exBtn.textContent='Exemplo indisponível';ex.play().then(()=>exBtn.textContent='Parar exemplo').catch(()=>{})};
+  const exBtn=el.querySelector('.ex');
+  exBtn.onclick=()=>exemplo(f,exBtn);
 });
 prog();
+/* Exemplo com a voz do próprio telemóvel: frase a frase, com pausas e o tom de cada estilo */
+const ESTILO={'Trailer (narrador)':{rate:.78,pitch:.55,pausa:650},'Entrada nas salas':{rate:.9,pitch:.85,pausa:450},'Audioguia':{rate:.92,pitch:.85,pausa:420},'Final':{rate:.82,pitch:1,pausa:800}};
+const DELA=['t04','t07'];
+function melhorVoz(){const v=speechSynthesis.getVoices().filter(x=>/pt[-_]PT/i.test(x.lang));
+  return v.find(x=>/premium|enhanced|melhorad/i.test(x.name))||v.find(x=>/catarina|joana|joaquim|duarte/i.test(x.name))||v[0]||speechSynthesis.getVoices().find(x=>/^pt/i.test(x.lang))}
+let exBtnAtivo=null;
+function exemplo(f,btn){
+  speechSynthesis.cancel();if(exBtnAtivo===btn){exBtnAtivo=null;btn.textContent='Ouvir exemplo';return}
+  if(exBtnAtivo)exBtnAtivo.textContent='Ouvir exemplo';exBtnAtivo=btn;btn.textContent='Parar exemplo';
+  const e=DELA.includes(f.id)?{rate:1.08,pitch:1.35,pausa:300}:ESTILO[f.grupo];const v=melhorVoz();
+  const partes=f.texto.replace(/\.\.\./g,'…').split(/(?<=[.,!?…])\s+/).filter(Boolean);
+  let i=0;(function next(){if(exBtnAtivo!==btn)return;if(i>=partes.length){exBtnAtivo=null;btn.textContent='Ouvir exemplo';return}
+    const u=new SpeechSynthesisUtterance(partes[i++]);u.lang='pt-PT';if(v)u.voice=v;u.rate=e.rate;u.pitch=e.pitch;
+    u.onend=()=>setTimeout(next,/[.!?…]$/.test(partes[i-1])?e.pausa:e.pausa*.45);u.onerror=()=>{exBtnAtivo=null;btn.textContent='Ouvir exemplo'};speechSynthesis.speak(u)})();
+}
+speechSynthesis.onvoiceschanged=()=>{};
 if(!window.MediaRecorder){$('err').hidden=false;$('err').textContent='Este browser não consegue gravar. Usa o Safari ou o Chrome atualizados.'}
 </script></body></html>
