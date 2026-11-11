@@ -1,2 +1,4 @@
-Põe aqui as gravações feitas no gravar.html (t01.m4a, o1.m4a, ...).
+Põe aqui as tuas gravações feitas no gravar.html (t01.m4a, o1.m4a, ...).
 O museu usa-as no lugar da voz sintética.
+
+A pasta exemplos/ tem gravações de referência com voz sintética, só para ouvires o ritmo. O museu não as usa.

@@ -23,6 +23,7 @@ h2{font:600 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color
 .row .rec{background:var(--rec);color:#fff}
 .row .rec.on{animation:pulse 1s infinite}
 @keyframes pulse{50%{opacity:.55}}
+.row .ex{background:transparent;border:1px solid var(--gold);color:var(--gold)}
 .row a.save{background:var(--ok);color:#06170b}
 .row .t{font:500 13px ui-monospace,Menlo,monospace;color:var(--muted)}
 .err{background:#3a1d1d;border:1px solid #6b2c2c;border-radius:12px;padding:12px 14px;font-size:14px}
@@ -31,6 +32,7 @@ h2{font:600 13px var(--sans);letter-spacing:.14em;text-transform:uppercase;color
 <p class="lead">Aqui gravas as falas do museu com a tua voz. Cada gravação substitui a voz sintética.</p>
 <div class="how"><b>Como fazer</b><ol>
   <li>Abre esta página no telemóvel e vai para um sítio sem barulho.</li>
+  <li>Carrega em <b>Ouvir exemplo</b> para ouvires o ritmo e as pausas. A voz do exemplo é de robô, a tua vai ser melhor.</li>
   <li>Em cada fala, carrega em <b>Gravar</b>, lê o texto e carrega em <b>Parar</b>. Ouve e repete se quiseres.</li>
   <li>Carrega em <b>Guardar</b>. O ficheiro sai já com o nome certo (por exemplo <b>t01.m4a</b>).</li>
   <li>No fim, põe todos os ficheiros na pasta <b>audio/</b> do repositório (no GitHub: Add file, Upload files) ou envia-mos.</li>
@@ -52,7 +54,7 @@ let grupo='';
 FALAS.forEach(f=>{
   if(f.grupo!==grupo){grupo=f.grupo;const h=document.createElement('h2');h.textContent=grupo;$('list').appendChild(h)}
   const el=document.createElement('div');el.className='line';
-  el.innerHTML=`<div class="id">${f.id}.${EXT}</div><div class="tx"></div><div class="row"><button class="rec" type="button">Gravar</button><button class="play" type="button" hidden>Ouvir</button><a class="save" hidden>Guardar</a><span class="t"></span></div>`;
+  el.innerHTML=`<div class="id">${f.id}.${EXT}</div><div class="tx"></div><div class="row"><button class="ex" type="button">Ouvir exemplo</button><button class="rec" type="button">Gravar</button><button class="play" type="button" hidden>Ouvir</button><a class="save" hidden>Guardar</a><span class="t"></span></div>`;
   el.querySelector('.tx').textContent=f.texto;$('list').appendChild(el);
   const rec=el.querySelector('.rec'),play=el.querySelector('.play'),save=el.querySelector('.save'),t=el.querySelector('.t');
   let mr=null,chunks=[],url=null,t0=0,tick=null,audio=null;
@@ -65,6 +67,8 @@ FALAS.forEach(f=>{
       audio=new Audio(url);play.hidden=false;save.hidden=false;save.href=url;save.download=`${f.id}.${EXT}`;done.add(f.id);el.classList.add('done');prog()};
     mr.start();rec.classList.add('on');rec.textContent='Parar';t0=Date.now();tick=setInterval(()=>t.textContent=((Date.now()-t0)/1000).toFixed(1)+' s',100)};
   play.onclick=()=>{if(audio){audio.currentTime=0;audio.play()}};
+  const exBtn=el.querySelector('.ex');let ex=null;
+  exBtn.onclick=()=>{if(ex&&!ex.paused){ex.pause();exBtn.textContent='Ouvir exemplo';return}document.querySelectorAll('audio').forEach(a=>a.pause());ex=new Audio(`audio/exemplos/${f.id}.m4a`);ex.onended=()=>exBtn.textContent='Ouvir exemplo';ex.onerror=()=>exBtn.textContent='Exemplo indisponível';ex.play().then(()=>exBtn.textContent='Parar exemplo').catch(()=>{})};
 });
 prog();
 if(!window.MediaRecorder){$('err').hidden=false;$('err').textContent='Este browser não consegue gravar. Usa o Safari ou o Chrome atualizados.'}
