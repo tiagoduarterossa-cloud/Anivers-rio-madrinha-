@@ -48,7 +48,7 @@ const FALAS=todasAsFalas();
 const MIME=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(m))||'';
 const EXT=MIME.includes('mp4')?'m4a':MIME.includes('ogg')?'ogg':'webm';
 let stream=null,done=new Set();
-async function mic(){if(stream)return stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});return stream}catch(e){$('err').hidden=false;$('err').textContent='Não consegui usar o microfone. Confirma que deste autorização ao browser e que a página está aberta por https (GitHub Pages).';throw e}}
+async function mic(){if(stream)return stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}});return stream}catch(e){$('err').hidden=false;$('err').innerHTML='<b>Aqui não dá para gravar.</b> Faz assim: abre a app Gravador do iPhone, grava cada fala e muda o nome da gravação para o código que aparece por cima dela (por exemplo t01). No fim, envia-me as gravações ou põe-nas na pasta audio/ do GitHub. O botão Ouvir exemplo continua a funcionar.';$('err').scrollIntoView({behavior:'smooth',block:'center'});throw e}}
 function prog(){$('prog').textContent=`${done.size} de ${FALAS.length} falas gravadas`}
 let grupo='';
 FALAS.forEach(f=>{
