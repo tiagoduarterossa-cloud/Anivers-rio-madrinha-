@@ -27,7 +27,7 @@ const SALAS=[
      tx:'Obra do mesmo dia, já no almoço. A madrinha sorri. O afilhado mantém uma expressão de crítico de arte exigente. Os historiadores acreditam que estava a avaliar se a madrinha servia. Servia.',
      voz:{id:'o4'}}]},
   {nome:'Arquivo histórico',wall:'#23324a',voz:{id:'s3',texto:'Sala três. Arquivo histórico.'},obras:[
-    {jornal:true,foto:'fotos/bebe.jpg',ar:'l',e:'📰',paint:'linear-gradient(135deg,#efe7d3,#bdb196)',t:'Diário da Família, 22/11/1988',y:'1988',
+    {jornal:true,foto:'fotos/jornal.jpg',ar:'l',e:'📰',paint:'linear-gradient(135deg,#efe7d3,#bdb196)',t:'Diário da Família, 22/11/1988',y:'1988',
      tech:'Tinta de jornal sobre papel, edição única',
      tx:'A peça mais antiga da coleção. É a primeira página publicada no dia em que tudo começou. Recomenda-se a leitura completa, sobretudo dos classificados.',
      voz:{id:'o5'}}]},
